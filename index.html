@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PHILO | 精神原型测试</title>
-    <!-- 引入高级字体组合 -->
+    <!-- 优化：添加 font-display: swap 确保字体加载慢时不阻塞页面 -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@200;300;400;500;700&family=Inter:wght@100;200;300&display=swap" rel="stylesheet">
-    <!-- 更换为更稳定的 CDN 链接 -->
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    
     <style>
         :root {
             --bg: #080808;
@@ -16,15 +15,19 @@
             --text-dim: #606060;
             --text-sub: #888888;
             --border: rgba(184, 156, 109, 0.15);
-            --transition: all 1s cubic-bezier(0.19, 1, 0.22, 1);
+            --transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        /* 优化：提供强大的系统备用字体，防止字体加载失败导致白屏 */
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+        }
 
         body {
             background-color: var(--bg);
             color: var(--text-main);
-            font-family: 'Noto Serif SC', serif;
+            font-family: 'Noto Serif SC', "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", serif;
             min-height: 100vh;
             display: flex; justify-content: center; align-items: flex-start;
             overflow-x: hidden; position: relative;
@@ -33,78 +36,87 @@
         #app { width: 90%; max-width: 400px; z-index: 10; min-height: 100vh; display: flex; flex-direction: column; }
 
         .progress-line {
-            position: fixed; top: 0; left: 0; height: 1.5px;
-            background: var(--accent); transition: width 0.8s ease; z-index: 1000;
+            position: fixed; top: 0; left: 0; height: 2px;
+            background: var(--accent); transition: width 0.6s ease; z-index: 1000;
         }
 
+        /* 初始状态通过 display: none 和 opacity 结合，确保脚本能控制显示 */
         .screen {
-            display: none; opacity: 0; transition: var(--transition);
-            flex: 1; padding-top: 15vh; padding-bottom: 8vh;
+            display: none; opacity: 0; 
+            flex: 1; padding: 15vh 0 8vh;
         }
 
-        .screen.active { display: flex; flex-direction: column; opacity: 1; }
+        .screen.active { 
+            display: flex; flex-direction: column; 
+            animation: fadeIn 0.8s forwards;
+        }
 
-        /* --- Home --- */
-        .brand { margin-bottom: 6rem; }
-        .brand h1 { font-family: 'Cinzel', serif; font-size: 3.5rem; letter-spacing: 0.15em; color: var(--accent); font-weight: 400; line-height: 1; }
-        .brand p { font-family: 'Inter', sans-serif; font-size: 0.6rem; letter-spacing: 0.8em; color: var(--text-dim); text-transform: uppercase; margin-top: 1rem; }
-        .hero-text { font-size: 1.1rem; line-height: 2.6; font-weight: 200; letter-spacing: 0.22em; margin-bottom: 7rem; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        /* --- Quiz --- */
-        .step-num { font-family: 'Cinzel', serif; color: var(--accent); font-size: 0.65rem; letter-spacing: 0.5em; margin-bottom: 3rem; }
-        .question-box { margin-bottom: 5rem; }
+        /* --- UI Elements --- */
+        .brand { margin-bottom: 5rem; }
+        .brand h1 { font-family: 'Cinzel', serif; font-size: 3rem; letter-spacing: 0.15em; color: var(--accent); font-weight: 400; line-height: 1; }
+        .brand p { font-family: 'Inter', sans-serif; font-size: 0.55rem; letter-spacing: 0.8em; color: var(--text-dim); text-transform: uppercase; margin-top: 1rem; }
+        .hero-text { font-size: 1.1rem; line-height: 2.6; font-weight: 200; letter-spacing: 0.22em; margin-bottom: 6rem; }
+
+        .step-num { font-family: 'Cinzel', serif; color: var(--accent); font-size: 0.65rem; letter-spacing: 0.4em; margin-bottom: 2.5rem; }
+        .question-box { margin-bottom: 4rem; }
         .question-box h2 { font-size: 1.35rem; line-height: 1.8; font-weight: 400; letter-spacing: 0.05em; text-align: justify; }
-        .annotation { font-size: 0.75rem; color: var(--text-dim); margin-top: 2rem; line-height: 1.6; font-weight: 200; padding-left: 1.2rem; border-left: 1px solid var(--border); display: block; }
-        .options-list { display: flex; flex-direction: column; gap: 0.2rem; }
-        .opt { padding: 1.4rem 0; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer; transition: 0.4s; font-weight: 300; letter-spacing: 0.03em; display: flex; justify-content: space-between; align-items: center; }
-        .opt:active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(255,255,255,0.02); }
-        .opt::after { content: '⌞'; font-size: 0.9rem; opacity: 0; transition: 0.3s; color: var(--accent); }
-
-        /* --- Result --- */
-        #result-poster { padding: 4.5rem 1.8rem; background: #000; text-align: left; position: relative; }
-        .poster-header { border-bottom: 1px solid var(--border); padding-bottom: 3rem; margin-bottom: 3rem; }
-        .res-top-label { font-family: 'Inter', sans-serif; font-size: 0.5rem; color: var(--text-dim); letter-spacing: 0.6em; text-transform: uppercase; }
+        .annotation { font-size: 0.7rem; color: var(--text-dim); margin-top: 1.5rem; line-height: 1.6; font-weight: 200; padding-left: 1rem; border-left: 1px solid var(--border); display: block; }
         
-        .res-main-name { font-size: 4rem; color: var(--accent); font-weight: 700; letter-spacing: 0.05em; line-height: 1; }
-        .res-main-school { font-size: 0.85rem; color: var(--accent); letter-spacing: 0.4em; margin-top: 0.8rem; font-weight: 200; text-transform: uppercase; }
+        .options-list { display: flex; flex-direction: column; gap: 0.1rem; }
+        .opt { padding: 1.4rem 0; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer; font-weight: 300; display: flex; justify-content: space-between; align-items: center; }
+        .opt:active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(255,255,255,0.01); }
 
-        .secondary-archive { margin-top: 3.5rem; opacity: 0.5; }
+        /* --- Result Section --- */
+        #result-poster { padding: 4rem 1.8rem; background: #000; text-align: left; position: relative; }
+        .poster-header { border-bottom: 1px solid var(--border); padding-bottom: 2.5rem; margin-bottom: 3rem; }
+        .res-top-label { font-family: 'Inter', sans-serif; font-size: 0.45rem; color: var(--text-dim); letter-spacing: 0.5em; text-transform: uppercase; }
+        
+        .res-main-name { font-size: 3.5rem; color: var(--accent); font-weight: 700; letter-spacing: 0.05em; line-height: 1; margin-top: 1rem; }
+        .res-main-school { font-size: 0.8rem; color: var(--accent); letter-spacing: 0.35em; margin-top: 0.6rem; font-weight: 200; text-transform: uppercase; }
+
+        .secondary-archive { margin-top: 3.5rem; opacity: 0.55; }
         .res-secondary-name { font-size: 1.8rem; color: var(--text-sub); font-weight: 400; letter-spacing: 0.05em; line-height: 1.2; }
-        .res-secondary-school { font-size: 0.65rem; color: var(--text-sub); letter-spacing: 0.3em; margin-top: 0.4rem; font-weight: 200; text-transform: uppercase; }
+        .res-secondary-school { font-size: 0.65rem; color: var(--text-sub); letter-spacing: 0.3em; margin-top: 0.3rem; font-weight: 200; text-transform: uppercase; }
 
         .dimension-grid { margin-top: 3rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
-        .dim-item { text-align: center; border: 1px solid rgba(184, 156, 109, 0.1); padding: 1rem 0; }
-        .dim-label { font-size: 0.5rem; color: var(--text-dim); display: block; margin-bottom: 0.5rem; text-transform: uppercase; }
-        .dim-val { font-size: 0.7rem; color: var(--accent); font-weight: 400; letter-spacing: 0.1em; }
+        .dim-item { text-align: center; border: 1px solid rgba(184, 156, 109, 0.1); padding: 0.8rem 0; }
+        .dim-label { font-size: 0.45rem; color: var(--text-dim); display: block; margin-bottom: 0.4rem; text-transform: uppercase; }
+        .dim-val { font-size: 0.65rem; color: var(--accent); font-weight: 400; }
 
         .analysis-section { margin-top: 4rem; }
-        .section-tag { font-family: 'Inter', sans-serif; font-size: 0.55rem; color: var(--text-dim); letter-spacing: 0.5em; text-transform: uppercase; margin-bottom: 1.5rem; display: block; border-left: 2px solid var(--accent); padding-left: 0.8rem; }
-        
-        .analysis-body { font-size: 1rem; line-height: 2.1; color: #bbb; margin-bottom: 4rem; font-weight: 300; letter-spacing: 0.05em; text-align: justify; white-space: pre-wrap; }
+        .section-tag { font-family: 'Inter', sans-serif; font-size: 0.5rem; color: var(--text-dim); letter-spacing: 0.4em; text-transform: uppercase; margin-bottom: 1.2rem; display: block; border-left: 2px solid var(--accent); padding-left: 0.8rem; }
+        .analysis-body { font-size: 0.95rem; line-height: 2.1; color: #bbb; margin-bottom: 4rem; font-weight: 300; letter-spacing: 0.05em; text-align: justify; white-space: pre-wrap; }
 
         .reading-section { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); }
-        .reading-title { font-family: 'Cinzel', serif; font-size: 1.2rem; color: var(--accent); letter-spacing: 0.05em; font-weight: 400; font-style: italic;}
+        .reading-title { font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--accent); letter-spacing: 0.05em; font-weight: 400; font-style: italic;}
 
+        /* 二维码占位符：确保不会因为找不到图而显示“破碎图标” */
         .qr-placeholder { margin-top: 5rem; display: flex; flex-direction: column; align-items: center; padding-top: 3rem; border-top: 1px dashed var(--border); }
-        .qr-box { width: 95px; height: 95px; background: transparent; padding: 0; margin-bottom: 1.2rem; display: flex; align-items: center; justify-content: center; }
-        .qr-box img { width: 100%; height: 100%; object-fit: contain; background: #fff; padding: 4px; }
-        .qr-hint { font-size: 0.5rem; color: var(--text-dim); letter-spacing: 0.3em; text-transform: uppercase; }
+        .qr-box { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; }
+        .qr-box img { width: 100%; height: 100%; object-fit: contain; display: none; background: #fff; padding: 4px; }
+        .qr-hint { font-size: 0.45rem; color: var(--text-dim); letter-spacing: 0.25em; text-transform: uppercase; margin-top: 1rem; }
 
-        .nav-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; padding-bottom: 8rem; margin-top: 2rem; }
-        .btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 1.1rem; font-family: 'Inter', sans-serif; font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase; cursor: pointer; transition: 0.6s; outline: none; }
+        /* UI Control */
+        .nav-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding-bottom: 10vh; margin-top: 2rem; }
+        .btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 1.1rem; font-family: 'Inter', sans-serif; font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase; cursor: pointer; transition: 0.4s; }
         .btn:active { background: var(--accent); color: #000; }
         
-        .loading-screen { position: fixed; inset: 0; background: #000; display: none; justify-content: center; align-items: center; z-index: 2000; color: var(--accent); font-family: 'Cinzel'; letter-spacing: 0.6em; font-size: 0.7rem; }
+        .loading-screen { position: fixed; inset: 0; background: #080808; display: flex; justify-content: center; align-items: center; z-index: 2000; color: var(--accent); font-family: 'Cinzel'; letter-spacing: 0.6em; font-size: 0.7rem; }
     </style>
 </head>
 <body>
 
     <div class="progress-line" id="progress"></div>
-    <div class="loading-screen" id="loader">ARCHIVING MIND...</div>
+    <!-- 增加一个手动关闭的“正在加载”屏，防止 JS 没跑完页面就卡住 -->
+    <div class="loading-screen" id="loader">PERCEIVING...</div>
 
     <div id="app">
-        <!-- 首页 -->
-        <section id="home" class="screen active">
+        <section id="home" class="screen">
             <div class="brand">
                 <h1>PHILO.</h1>
                 <p>Intellectual Coordinates</p>
@@ -115,7 +127,6 @@
             <button class="btn" style="width: 170px;" onclick="start()">开启审视</button>
         </section>
 
-        <!-- 测试页 -->
         <section id="quiz" class="screen">
             <div class="step-num" id="q-idx">Step 01 / 20</div>
             <div class="question-box">
@@ -124,19 +135,18 @@
             <div class="options-list" id="q-options"></div>
         </section>
 
-        <!-- 结果页 -->
         <section id="result" class="screen">
             <div id="result-poster">
                 <div class="poster-header">
                     <span class="res-top-label">Mind Archive Identification</span>
                     <div class="primary-archive">
-                        <h2 class="res-main-name" id="res-name">尼采</h2>
-                        <div class="res-main-school" id="res-school">EXISTENTIALISM</div>
+                        <h2 class="res-main-name" id="res-name">---</h2>
+                        <div class="res-main-school" id="res-school">---</div>
                     </div>
                     <div class="secondary-archive">
                         <span class="res-top-label" style="letter-spacing: 0.3em; opacity: 0.5;">Secondary Archetype</span>
-                        <h3 class="res-secondary-name" id="res-sub-name">马可·奥勒留</h3>
-                        <div class="res-secondary-school" id="res-sub-school">STOICISM</div>
+                        <h3 class="res-secondary-name" id="res-sub-name">---</h3>
+                        <div class="res-secondary-school" id="res-sub-school">---</div>
                     </div>
                     <div class="dimension-grid">
                         <div class="dim-item"><span class="dim-label">Cognitive</span><span class="dim-val" id="dim-1">---</span></div>
@@ -146,18 +156,15 @@
                 </div>
                 <div class="analysis-section">
                     <span class="section-tag">Portrait Analysis</span>
-                    <div class="analysis-body" id="res-desc"></div>
+                    <div class="analysis-body" id="res-desc">---</div>
                 </div>
                 <div class="reading-section">
                     <span class="section-tag">Required Reading</span>
-                    <span class="reading-title" id="res-book"></span>
+                    <span class="reading-title" id="res-book">---</span>
                 </div>
-                <!-- 二维码显示区域 -->
                 <div class="qr-placeholder" data-html2canvas-ignore="true">
                     <div class="qr-box">
-                        <img id="qr-image" src="/wechat-qr.png" alt="WeChat QR" 
-                             style="display: none;" 
-                             onload="this.style.display='block'; this.parentElement.style.background='#fff';">
+                        <img id="qr-image" src="/wechat-qr.png" alt="QR" onload="this.style.display='block';">
                     </div>
                     <p class="qr-hint">Scan to Connect / Feedback</p>
                 </div>
@@ -169,40 +176,57 @@
         </section>
     </div>
 
+    <!-- 异步加载截图库，不阻塞首屏渲染 -->
+    <script async src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
     <script>
-        // ... 问题数据部分保持不变 ...
+        // 核心保护：脚本加载完成后立即隐藏加载屏
+        window.addEventListener('load', function() {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('home').classList.add('active');
+        });
+
+        // 容错处理：如果 3 秒后还没加载完，强制关闭加载屏显示内容
+        setTimeout(() => {
+            const l = document.getElementById('loader');
+            if (l.style.display !== 'none') {
+                l.style.display = 'none';
+                document.getElementById('home').classList.add('active');
+            }
+        }, 3000);
+
         const questions = [
-            { q: "清晨第一杯浓咖啡不慎泼向你正在待命的笔记本电脑。在那一秒，你的第一反应：", options: [{ t: "接受现况。损害已发，情绪波动无法修补主板。冷静断电擦拭。", s: { stoicism: 5, empiricism: 1 } }, { t: "赋予意义。这是一个荒诞的打击，但我可以选择不让它毁掉我的这一天。", s: { existentialism: 5 } }, { t: "溯源分析。我的放置习惯存在逻辑漏洞。评估灾情并记录教训。", s: { rationalism: 5, deontology: 1 } }] },
-            { q: "如果有一种‘体验机’，能让你在缸中度过绝对幸福、毫无痛苦的一生（虽是虚假），你会：", options: [{ t: "进入。快乐的边际效用即是生命的终极追求，真假并不重要。", s: { utilitarianism: 5, materialism: 2 } }, { t: "拒绝。真实的痛苦远比虚假的极乐更有尊严，我追求本体的真。", s: { idealism: 5, deontology: 2 } }, { t: "怀疑。谁在维护机器？这种‘快乐’是否只是某种权力的投喂？", s: { postmodernism: 5 } }] },
-            { q: "你拥有一枚可以让你在现实中完全隐形的戒指（盖吉氏戒指），你会：", ann: "柏拉图笔下的隐身寓言：当行为不再产生后果，你将臣服于本能，还是恪守德性？", options: [{ t: "依然克制。道德来自于我内心的自律，而非外界的监督。", s: { deontology: 5, stoicism: 2 } }, { t: "释放本能。既然惩罚契约已失效，我将追求绝对的感官自由。", s: { existentialism: 5, utilitarianism: 2 } }, { t: "解构。隐形意味着我退出了全景监狱，观察权力的运作。", s: { postmodernism: 5 } }] },
-            { q: "你用了十年的手机，零件被全部更换了一遍，它还是原来那个手机吗（忒修斯之船）？", options: [{ t: "不是。物质实体的连续性已经断裂，它是全新的构造。", s: { empiricism: 5, materialism: 3 } }, { t: "是。只要它承载的‘我之物’这一理式核心没有改变。", s: { idealism: 5, deontology: 1 } }, { t: "取决于我。‘身份’只是标签，我如何命名它，它就是什么。", s: { postmodernism: 4, existentialism: 2 } }] },
-            { q: "色盲科学家玛丽研究了关于红色的所有物理数据，当她第一次亲眼看到红色：", options: [{ t: "她学到了新知识。感官经验（Qualia）无法被物理数据穷尽。", s: { empiricism: 5 } }, { t: "她没学到新知识。大脑的电化学反应已在她的逻辑推演之中。", s: { rationalism: 5, materialism: 3 } }, { t: "这说明‘红色’只是一种主观建构，并无统一的客观标准。", s: { postmodernism: 5 } }] },
-            { q: "如果你被告知，传送机在目的地复制了你的原子，但摧毁了这里的你：", options: [{ t: "拒绝。自我的独一无二性在于意识的连续，而非原子的排列。", s: { deontology: 4, idealism: 3 } }, { t: "接受。只要那个‘我’拥有完全相同的记忆，他就是我。", s: { utilitarianism: 4, empiricism: 3 } }, { t: "无所谓。‘我’本身就是一个不断流动的虚构叙事。", s: { existentialism: 5, postmodernism: 2 } }] },
-            { q: "在一场资源极度匮乏的博弈中，背叛可以让你生存，守信则会导致毁灭：", options: [{ t: "守信。我绝不将他人作为生存的手段，哪怕这意味着毁灭。", s: { deontology: 5, idealism: 1 } }, { t: "背叛。生存是行使一切权利前提，这是生命的本能意志。", s: { existentialism: 5, utilitarianism: 3 } }, { t: "博弈。分析对方的行为逻辑，寻找一个成本最低的平衡点。", s: { rationalism: 5, stoicism: 1 } }] },
-            { q: "关于‘美’，你的直觉更偏向：", options: [{ t: "美是事物背后永恒的数学比例与和谐理式。", s: { idealism: 5, rationalism: 3 } }, { t: "美是这一瞬间带给我感官最强烈的颤栗与愉悦。", s: { empiricism: 5, materialism: 1 } }, { t: "美是特定时代与权力话语建构出来的审美特权。", s: { postmodernism: 5 } }] },
-            { q: "为了彻底根除犯罪，你是否愿意生活在一个读取脑电波监控意图的社会？", options: [{ t: "愿意。极致的秩序是理性能为人类提供的最大福利。", s: { utilitarianism: 5, rationalism: 2 } }, { t: "拒绝。自由意志的隐私比单纯的安全具有更高的道德位阶。", s: { deontology: 5, stoicism: 1 } }, { t: "警惕。这种全方位的‘规训’只会消解人类作为主体的可能。", s: { postmodernism: 5 } }] },
-            { q: "当你发现深交多年的好友在背后议论你的隐私时：", options: [{ t: "克制。他的言论无法伤害我的核心，唯有我的反应可以。", s: { stoicism: 5 } }, { t: "决裂。我通过这次选择，重新划定了我的存在边界。", s: { existentialism: 5, deontology: 1 } }, { t: "分析。评估这段关系的信任成本，决定是否继续投入。", s: { utilitarianism: 4, rationalism: 2 } }] },
-            { q: "你认为语言的作用在于：", options: [{ t: "映射世界。它是一面镜子，尽可能准确地映射出外部世界。", s: { rationalism: 4, empiricism: 2 } }, { t: "构造疆界。作为一套规则，它限制了我的思考疆界。", s: { existentialism: 4, idealism: 1 } }, { t: "权力工具。它在玩弄符号以掩盖真实的控制关系。", s: { postmodernism: 5 } }] },
-            { q: "关于历史的演进，你认为它：", options: [{ t: "绝对理性。是向着理性和自由不断进化的宏大进程。", s: { idealism: 5, rationalism: 2 } }, { t: "西西弗斯。是无意义的重复，我们只能在推石中寻找英雄主义。", s: { stoicism: 5, existentialism: 2 } }, { t: "偶然断裂。是断裂、偶然与被后来者粉饰过的权力更迭史。", s: { postmodernism: 5 } }] },
-            { q: "如果要你牺牲一个无辜的孩子来拯救一个濒临灭亡的星系：", options: [{ t: "拒绝。绝对的正义不容许任何个体的‘工具化’。", s: { deontology: 5 } }, { t: "牺牲。这是残酷但必须面对的宇宙算力选择。", s: { utilitarianism: 5, materialism: 1 } }, { t: "质问。这种极端的设定本身就在羞辱人类道德的复杂性。", s: { postmodernism: 4 } }] },
-            { q: "你如何看待现代人对‘算法推荐’的依赖？", options: [{ t: "高效逻辑。它优化了信息获取的边际成本，符合理性逻辑。", s: { utilitarianism: 4, rationalism: 2 } }, { t: "主体退化。它正在剥夺人类主动选择（自我塑造）的机会。", s: { existentialism: 5, stoicism: 1 } }, { t: "数字规训。它利用欲望数据完成对个体的原子化管理。", s: { postmodernism: 5 } }] },
-            { q: "在人生的终极关头，你最希望被评价为：", options: [{ t: "有德之人。一个遵循了天职、具有无懈可击德性的人。", s: { deontology: 5, stoicism: 3 } }, { t: "独特灵魂。一个真实、勇敢且不可被替代的自由灵魂。", s: { existentialism: 5 } }, { t: "清醒洞察。一个看透了幻象、不曾被任何叙事蒙蔽的人。", s: { postmodernism: 5 } }] },
-            { q: "关于‘自我’，你认为最本质的内核是：", options: [{ t: "思辨实体。能够进行逻辑分析的思想实体（Cogito）。", s: { rationalism: 5 } }, { t: "行动总和。通过一次次具体行动所积攒出的动态过程。", s: { existentialism: 5 } }, { t: "连贯幻觉。大脑物理反应产生的电信号幻觉，并无稳定本质。", s: { empiricism: 5, materialism: 2 } }] },
-            { q: "如果必须选择，你更愿意做一个痛苦的苏格拉底，还是快乐的猪？", options: [{ t: "苏格拉底。理性的自省是人之所以为人的最高尊严。", s: { idealism: 5, rationalism: 2 } }, { t: "快乐的猪。如果终点都是虚无，快乐是唯一的感官真理。", s: { utilitarianism: 5, empiricism: 2 } }, { t: "消解问题。这只是精英阶层为了维持优越感构建的虚假二元对立。", s: { postmodernism: 5 } }] },
-            { q: "你认为法律存在的最高依据应该是：", options: [{ t: "自然理性。永恒不变的、符合宇宙秩序的法学逻辑。", s: { deontology: 5, idealism: 2 } }, { t: "治安效能。能够为当前社会提供最大化治安效能的工具。", s: { utilitarianism: 5, materialism: 1 } }, { t: "权力语术。特定阶级为了维持统治而发明的符号规则。", s: { postmodernism: 5 } }] },
-            { q: "当你独自站在星空下感受到敬畏时，那是：", options: [{ t: "经验反应。感官对宏大物理规律的一种直接经验反应。", s: { empiricism: 5, materialism: 1 } }, { t: "道德共振。我内心的道德律与宇宙秩序产生的共振。", s: { deontology: 5, idealism: 2 } }, { t: "语言眩晕。由于我的语言无法描述无限而产生的逻辑眩晕。", s: { rationalism: 4, existentialism: 2 } }] },
-            { q: "最终，你如何定义‘意义’？", options: [{ t: "实践美德。在被赋予的职责中寻找并实践最高的美德。", s: { deontology: 4, stoicism: 3 } }, { t: "亲手创造。在荒诞的世界中，由我亲手创造并赋予它的东西。", s: { existentialism: 5 } }, { t: "逃避幻觉。意义只是人类为了逃避虚无而发明的幻觉。", s: { postmodernism: 5, materialism: 1 } }] }
+            { q: "清晨第一杯浓咖啡不慎泼向你正在待命的笔记本电脑。在那一秒，你的第一反应：", options: [{ t: "接受现况。损害已发，情绪波动无法修补主板。冷静断电擦拭。", s: { stoicism: 5 } }, { t: "赋予意义。这是一个荒诞的打击，但我可以选择不让它毁掉我的这一天。", s: { existentialism: 5 } }, { t: "溯源分析。我的放置习惯存在逻辑漏洞。评估灾情并记录教训。", s: { rationalism: 5 } }] },
+            { q: "如果有一种‘体验机’，能让你在缸中度过绝对幸福、毫无痛苦的一生（虽是虚假），你会：", options: [{ t: "进入。快乐的边际效用即是生命的终极追求，真假并不重要。", s: { utilitarianism: 5 } }, { t: "拒绝。真实的痛苦远比虚假的极乐更有尊严，我追求本体的真。", s: { idealism: 5 } }, { t: "怀疑。谁在维护机器？这种‘快乐’是否只是某种权力的投喂？", s: { postmodernism: 5 } }] },
+            { q: "你拥有一枚可以让你在现实中完全隐形的戒指（盖吉氏戒指），你会：", ann: "柏拉图笔下的隐身寓言：当行为不再产生后果，你将臣服于本能，还是恪守德性？", options: [{ t: "依然克制。道德来自于我内心的自律，而非外界的监督。", s: { deontology: 5 } }, { t: "释放本能。既然惩罚契约已失效，我将追求绝对的感官自由。", s: { existentialism: 5 } }, { t: "解构。隐形意味着我退出了全景监狱，观察权力的运作。", s: { postmodernism: 5 } }] },
+            { q: "你用了十年的手机，零件被全部更换了一遍，它还是原来那个手机吗（忒修斯之船）？", options: [{ t: "不是。物质实体的连续性已经断裂，它是全新的构造。", s: { empiricism: 5 } }, { t: "是。只要它承载的‘我之物’这一理式核心没有改变。", s: { idealism: 5 } }, { t: "取决于我。‘身份’只是标签，我如何命名它，它就是什么。", s: { postmodernism: 4 } }] },
+            { q: "色盲科学家玛丽研究了关于红色的所有物理数据，当她第一次亲眼看到红色：", options: [{ t: "她学到了新知识。感官经验（Qualia）无法被物理数据穷尽。", s: { empiricism: 5 } }, { t: "她没学到新知识。大脑的电化学反应已在她的逻辑推演之中。", s: { rationalism: 5 } }, { t: "这说明‘红色’只是一种主观建构，并无统一的客观标准。", s: { postmodernism: 5 } }] },
+            { q: "如果你被告知，传送机在目的地复制了你的原子，但摧毁了这里的你：", options: [{ t: "拒绝。自我的独一无二性在于意识的连续，而非原子的排列。", s: { idealism: 3, deontology: 2 } }, { t: "接受。只要那个‘我’拥有完全相同的记忆，他就是我。", s: { utilitarianism: 5 } }, { t: "无所谓。‘我’本身就是一个不断流动的虚构叙事。", s: { existentialism: 5 } }] },
+            { q: "在一场资源极度匮乏的博弈中，背叛可以让你生存，守信则会导致毁灭：", options: [{ t: "守信。我绝不将他人作为生存手段，哪怕这意味着毁灭。", s: { deontology: 5 } }, { t: "背叛。生存是行使一切权利前提，这是生命的本能意志。", s: { existentialism: 5 } }, { t: "博弈分析。寻找一个成本最低的平衡点。", s: { rationalism: 5 } }] },
+            { q: "关于‘美’，你的直觉更偏向：", options: [{ t: "美是事物背后永恒的数学比例与和谐理式。", s: { idealism: 5 } }, { t: "美是这一瞬间带给我感官最强烈的颤栗与愉悦。", s: { empiricism: 5 } }, { t: "美是特定时代与权力话语建构出来的审美特权。", s: { postmodernism: 5 } }] },
+            { q: "为了彻底根除犯罪，你愿意生活在一个读取脑电波监控意图的社会吗？", options: [{ t: "愿意。极致的秩序是理性能为人类提供的最大福利。", s: { utilitarianism: 5 } }, { t: "拒绝。自由意志的隐私比单纯的安全具有更高的道德位阶。", s: { deontology: 5 } }, { t: "警惕。这种全方位的‘规训’只会消解主体的可能。", s: { postmodernism: 5 } }] },
+            { q: "当你发现深交多年的好友在背后议论你的隐私时：", options: [{ t: "克制。他的言论无法伤害我的核心，唯有我的反应可以。", s: { stoicism: 5 } }, { t: "决裂。我通过这次选择，重新划定了我的存在边界。", s: { existentialism: 5 } }, { t: "分析。评估这段关系的信任成本，决定是否继续投入。", s: { rationalism: 5 } }] },
+            { q: "你认为语言的作用在于：", options: [{ t: "映射世界。它是一面镜子，尽可能准确地映射出外部。", s: { rationalism: 4 } }, { t: "构造疆界。作为一套规则，它限制了我的思考疆界。", s: { existentialism: 4 } }, { t: "权力工具。它在玩弄符号以掩盖真实的控制关系。", s: { postmodernism: 5 } }] },
+            { q: "关于历史的演进，你认为它：", options: [{ t: "绝对理性。是向着理性和自由不断进化的宏大进程。", s: { idealism: 5 } }, { t: "西西弗斯。是无意义的重复，我们只能在推石中寻找英雄主义。", s: { stoicism: 5 } }, { t: "偶然断裂。是断裂、偶然与被后来者粉饰过的权力更迭史。", s: { postmodernism: 5 } }] },
+            { q: "如果要你牺牲一个无辜的孩子来拯救一个濒临灭亡的星系：", options: [{ t: "拒绝。绝对的正义不容许任何个体的‘工具化’。", s: { deontology: 5 } }, { t: "牺牲。这是残酷但必须面对的宇宙算力选择。", s: { utilitarianism: 5 } }, { t: "质问。这种极端的设定本身就在羞辱道德的复杂性。", s: { postmodernism: 5 } }] },
+            { q: "你如何看待现代人对‘算法推荐’的依赖？", options: [{ t: "高效。它优化了信息获取的边际成本，符合理性。", s: { utilitarianism: 5 } }, { t: "退化。它正在剥夺人类主动选择的机会。", s: { existentialism: 5 } }, { t: "数字规训。它利用欲望数据完成对个体的原子化管理。", s: { postmodernism: 5 } }] },
+            { q: "在人生的终极关头，你最希望被评价为：", options: [{ t: "有德之人。一个遵循了天职、具有无懈可击德性的人。", s: { deontology: 5 } }, { t: "独特灵魂。一个真实、勇敢且不可被替代的自由灵魂。", s: { existentialism: 5 } }, { t: "清醒洞察。一个看透了幻象、不曾被任何叙事蒙蔽的人。", s: { postmodernism: 5 } }] },
+            { q: "关于‘自我’，你认为最本质的内核是：", options: [{ t: "思辨实体。能够进行逻辑分析的思想实体（Cogito）。", s: { rationalism: 5 } }, { t: "行动总和。通过一次次具体行动所积攒出的动态过程。", s: { existentialism: 5 } }, { t: "连贯幻觉。大脑物理反应产生的电信号，并无本质。", s: { empiricism: 5 } }] },
+            { q: "如果必须选择，你更愿意做一个痛苦的苏格拉底，还是快乐的猪？", options: [{ t: "苏格拉底。理性的自省是人之所以为人的最高尊严。", s: { idealism: 5 } }, { t: "快乐的猪。如果终点都是虚无，快乐是唯一的真理。", s: { utilitarianism: 5 } }, { t: "消解。这只是优越感构建的虚假二元对立。", s: { postmodernism: 5 } }] },
+            { q: "你认为法律存在的最高依据应该是：", options: [{ t: "自然理性。永恒不变的、符合宇宙秩序的法学逻辑。", s: { deontology: 5 } }, { t: "治安效能。能够为当前社会提供最大化效能的工具。", s: { utilitarianism: 5 } }, { t: "权力语术。特定阶级为了维持统治而发明的符号规则。", s: { postmodernism: 5 } }] },
+            { q: "当你独自站在星空下感受到敬畏时，那是：", options: [{ t: "经验反应。感官对宏大物理规律的一种直接反应。", s: { empiricism: 5 } }, { t: "道德共振。我内心的道德律与宇宙秩序产生的共振。", s: { deontology: 5 } }, { t: "语言眩晕。由于我的语言无法描述无限而产生的眩晕。", s: { rationalism: 5 } }] },
+            { q: "最终，你如何定义‘意义’？", options: [{ t: "实践美德。在被赋予的职责中寻找并实践最高的美德。", s: { deontology: 5 } }, { t: "亲手创造。在荒诞的世界中，由我亲手赋予它的东西。", s: { existentialism: 5 } }, { t: "逃避幻觉。意义只是人类为了逃避虚无而发明的幻觉。", s: { postmodernism: 5 } }] }
         ];
 
         const icons = {
-            existentialism: { name: "尼采", school: "EXISTENTIALISM", condensed: "你深知『存在先于本质』。你的精神底色是悲剧性的英雄主义：在认清世界荒谬的真相后，依然选择以意志为刃，在虚无中劈开属于主体的价值神庙。你追求极致的主体性，在每一次的痛苦抉择中确认尊严，视生命为一场不断超越自我的实验。你坚信：每一个不曾起舞的日子，都是对生命的辜负。", book: "《查拉图斯特拉如是说》", dim: ["主动选择", "绝对自由", "意志导向"] },
-            stoicism: { name: "马可·奥勒留", school: "STOICISM", condensed: "你具备区分『可控』与『不可控』的智慧。在变幻莫测的命运面前，你选择在内心筑起一座不陷的堡垒，以不动心的理性接纳外界，以绝对的自律统治灵魂。你视理性的自律为最高的美德，将克制化为的力量，而非软弱的顺从。你在繁杂喧嚣的世界中寻得了一种‘不动心’的深度静谧，如同大海深处的磐石。", book: "《沉思录》", dim: ["内心秩序", "理性克制", "顺应自然"] },
-            deontology: { name: "康德", school: "DEONTOLOGY", condensed: "你是一个灵魂的立法者。你视道德为绝对的自律而非利益的权衡，将人视为终极目的而非手段。你在理性的秩序中，为脆弱的人性建立起尊严疆界。你敬畏道德律令如同敬畏头顶星空。在你眼中，道德不是某种利益的权衡，而是绝对的自律。你致力于在混乱的经验中开辟出一条普适性的正义之路。", book: "《纯粹理性批判》", dim: ["绝对律令", "形式正义", "理性自律"] },
-            rationalism: { name: "笛卡尔", school: "RATIONALISM", condensed: "你是思想的建筑师。你信奉逻辑穿透表象的力量，将『我思』视为宇宙认知的阿基米德点。你在怀疑的废墟上重建确定性，用数学般精准的演绎寻找统一。你拒绝被模糊的经验所蒙蔽，追求真理的确定性，相信理性可以构建起整个宇宙的宏伟大厦。我思，故你在。", book: "《第一哲学沉思录》", dim: ["逻辑优先", "演绎推理", "思辨实体"] },
-            postmodernism: { name: "福柯", school: "POST-MODERNISM", condensed: "你是一个敏锐的解构者，洞察着真理叙事背后的权力微观运作。你拒绝被宏大叙事绑架，在历史的断裂处重构身份的多重可能，以怀疑守护思想的极致纯度。你察觉到了隐藏在知识、语言和规则背后的权力运作。你站在边缘审视中心，挑战一切被视为‘理所当然’的分类体系。", book: "《规训与惩罚》", dim: ["解构权力", "怀疑真理", "多元视角"] },
-            utilitarianism: { name: "约翰·穆勒", school: "UTILITARIANISM", condensed: "你是一个理性的务实派。你追求最大多数人的幸福，将正义转化为可感的、普惠的社会现实。你在冷静的效用计算中，包裹着对人类苦难最切近的温润关怀。衡量善恶的标准应是结果。在你看来，哲学的价值在于改善现实世界，你关注人类经验的整体优化，是这个世界最温和的优化专家。", book: "《功利主义》", dim: ["结果导向", "效用最大", "经验计算"] },
-            empiricism: { name: "大卫·休谟", school: "EMPIRICISM", condensed: "你是一个大地最忠实的观察者。你拒绝超验的空中楼阁，只珍视当下的感知与习惯。你以谦卑的怀疑论拥抱世界的复杂，在流变的现象中深耕出最坚实的人生常识。你只相信感官。没有经验就没有知识，因果律不过是心理习惯。你以一种谦卑而务实的方式观察世界，拒绝陷入那些无法被证实的抽象迷思。", book: "《人类理智研究》", dim: ["经验至上", "感官证据", "温和怀疑"] },
-            idealism: { name: "柏拉图", school: "IDEALISM", condensed: "你是永恒的追光者。你追求感官投影背后的完美的『理式』原型。你的一生都在试图完成灵魂的转向，在流变的现实中捕捉那份神圣、永恒且绝对的和谐。在你看来，感官世界只是影子，真正的理式世界才具有终极意义。你的一生都在试图走出洞穴，仰望那轮真理的太阳。", book: "《理想国》", dim: ["绝对精神", "超越表象", "理念原型"] }
+            existentialism: { name: "尼采", school: "EXISTENTIALISM", condensed: "你深知『存在先于本质』。你的精神底色是悲剧性的英雄主义：在认清世界荒谬的真相后，依然选择以意志为刃，在虚无中劈开属于主体的价值神庙。你追求极致的主体性，在权力的意志中完成自我的重塑。每一个不曾起舞的日子，都是对生命的辜负。", book: "《查拉图斯特拉如是说》", dim: ["主动选择", "绝对自由", "意志导向"] },
+            stoicism: { name: "马可·奥勒留", school: "STOICISM", condensed: "你具备区分『可控』与『不可控』的智慧。在变幻莫测的命运面前，你选择在内心筑起一座不陷的堡垒，以不动心的理性接纳外界。你视理性的自律为最高的美德，将克制化为力量。你在繁杂喧嚣的世界中寻得了一种深度静谧，锚定在宇宙的客观逻辑之中。", book: "《沉思录》", dim: ["内心秩序", "理性克制", "顺应自然"] },
+            deontology: { name: "康德", school: "DEONTOLOGY", condensed: "你是一个灵魂的立法者。你视道德为绝对的自律，将人视为终极目的而非手段。你在理性的秩序中，为脆弱的人性建立起尊严疆界。你敬畏道德律令如同敬畏头顶星空，相信理性的立法权能为混乱的经验世界建立起永恒的疆界。", book: "《纯粹理性批判》", dim: ["绝对律令", "形式正义", "理性自律"] },
+            rationalism: { name: "笛卡尔", school: "RATIONALISM", condensed: "你是思想的建筑师。你信奉逻辑穿透表象的力量，将『我思』视为宇宙认知的阿基米德点。你在怀疑的废墟上重建确定性，用数学般精准的演绎寻找统一。你排斥模糊，追求明晰，用理性的光芒照亮未知的阴影，在思辨的极致中寻找精神与真理的永恒统一。", book: "《第一哲学沉思录》", dim: ["逻辑优先", "演绎推理", "思辨实体"] },
+            postmodernism: { name: "福柯", school: "POST-MODERNISM", condensed: "你是一个敏锐的解构者，洞察着真理叙事背后的权力微观运作。你拒绝被宏大叙事绑架，在历史的断裂处重构身份的多重可能。你深知真理往往只是权力的某种文学表达，通过不断的怀疑与审视，你正试图逃离那座全方位的、名为“规范”的监禁。", book: "《规训与惩罚》", dim: ["解构权力", "怀疑真理", "多元视角"] },
+            utilitarianism: { name: "约翰·穆勒", school: "UTILITARIANISM", condensed: "你是一个理性的务实派。你追求最大多数人的幸福，将正义转化为可感的、普惠的社会现实。你在冷静的效用计算中，包裹着对人类苦难最切近的关怀。你是这个世界的优化专家，致力于在理性的天平上实现最大的善良，让抽象的哲学在现实中生根发芽。", book: "《功利主义》", dim: ["结果导向", "效用最大", "经验计算"] },
+            empiricism: { name: "大卫·休谟", school: "EMPIRICISM", condensed: "你是一个大地最忠实的观察者。你拒绝超验的空中楼阁，只珍视当下的感知与习惯。你以谦卑的怀疑论拥抱世界的复杂，在流变的现象中深耕常识。你不追求虚无缥缈的绝对真理，只愿在经验的泥土里辨认世界的样貌，是这个世界最务实、最诚实的见证者。", book: "《人类理智研究》", dim: ["经验至上", "感官证据", "温和怀疑"] },
+            idealism: { name: "柏拉图", school: "IDEALISM", condensed: "你是永恒的追光者。你追求感官投影背后的完美的『理式』原型。你的一生都在试图完成灵魂的转向，走出洞穴。你视思想为唯一稳固的实体，追求灵魂在高度上的净化与升华。你试图在瞬息万变的现实中捕捉那份神圣、永恒且绝对的和谐与真理。", book: "《理想国》", dim: ["绝对精神", "超越表象", "理念原型"] }
         };
 
         let current = 0, score = {};
@@ -248,33 +272,44 @@
             document.getElementById('dim-1').innerText = resPrimary.dim[0];
             document.getElementById('dim-2').innerText = resPrimary.dim[1];
             document.getElementById('dim-3').innerText = resPrimary.dim[2];
-            
             document.getElementById('res-sub-name').innerText = resSecondary.name;
             document.getElementById('res-sub-school').innerText = resSecondary.school;
-            
             document.getElementById('res-desc').innerText = resPrimary.condensed;
             document.getElementById('res-book').innerText = resPrimary.book;
             
             show('result');
         }
         function show(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            setTimeout(() => { const el = document.getElementById(id); el.classList.add('active'); el.scrollTop = 0; }, 50);
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(s => {
+                s.classList.remove('active');
+                s.style.display = 'none';
+            });
+            const target = document.getElementById(id);
+            target.style.display = 'flex';
+            setTimeout(() => { target.classList.add('active'); }, 50);
+            window.scrollTo(0,0);
         }
         function savePoster() {
+            if (typeof html2canvas === 'undefined') {
+                alert("组件加载中，请稍后重试");
+                return;
+            }
             const loader = document.getElementById('loader');
+            loader.innerText = "PREPARING...";
             loader.style.display = 'flex';
+            
             html2canvas(document.getElementById('result-poster'), { 
-                backgroundColor: '#000', 
-                scale: 2, 
-                logging: false,
-                useCORS: true 
+                backgroundColor: '#000', scale: 2, logging: false, useCORS: true 
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `PHILO_ARCHIVE_${Date.now()}.png`;
+                link.download = `PHILO_ARCHIVE.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 loader.style.display = 'none';
+            }).catch(() => {
+                loader.style.display = 'none';
+                alert("生成失败，请长按截图保存");
             });
         }
     </script>
