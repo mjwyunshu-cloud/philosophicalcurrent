@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PHILO | 精神原型测试</title>
-    <!-- 优化：添加 font-display: swap 确保字体加载慢时不阻塞页面 -->
+    <!-- 核心保护：添加 font-display: swap 确保字体加载慢时不阻塞页面渲染 -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@200;300;400;500;700&family=Inter:wght@100;200;300&display=swap" rel="stylesheet">
     
     <style>
@@ -18,7 +18,7 @@
             --transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
         }
 
-        /* 优化：提供强大的系统备用字体，防止字体加载失败导致白屏 */
+        /* 字体降级方案：防止手机端因 Google 字体加载失败导致白屏 */
         * { 
             margin: 0; padding: 0; box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent;
@@ -40,7 +40,6 @@
             background: var(--accent); transition: width 0.6s ease; z-index: 1000;
         }
 
-        /* 初始状态通过 display: none 和 opacity 结合，确保脚本能控制显示 */
         .screen {
             display: none; opacity: 0; 
             flex: 1; padding: 15vh 0 8vh;
@@ -56,22 +55,25 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --- UI Elements --- */
+        /* --- 首页 (修正：居中对齐) --- */
+        #home { text-align: center; }
         .brand { margin-bottom: 5rem; }
-        .brand h1 { font-family: 'Cinzel', serif; font-size: 3rem; letter-spacing: 0.15em; color: var(--accent); font-weight: 400; line-height: 1; }
-        .brand p { font-family: 'Inter', sans-serif; font-size: 0.55rem; letter-spacing: 0.8em; color: var(--text-dim); text-transform: uppercase; margin-top: 1rem; }
-        .hero-text { font-size: 1.1rem; line-height: 2.6; font-weight: 200; letter-spacing: 0.22em; margin-bottom: 6rem; }
+        .brand h1 { font-family: 'Cinzel', serif; font-size: 3.2rem; letter-spacing: 0.2em; color: var(--accent); font-weight: 400; line-height: 1; margin-left: 0.2em; }
+        .brand p { font-family: 'Inter', sans-serif; font-size: 0.55rem; letter-spacing: 0.8em; color: var(--text-dim); text-transform: uppercase; margin-top: 1.2rem; text-indent: 0.8em; }
+        .hero-text { font-size: 1.1rem; line-height: 2.8; font-weight: 200; letter-spacing: 0.25em; margin-bottom: 6rem; color: #ccc; }
+        .start-btn { margin: 0 auto; width: 180px; }
 
-        .step-num { font-family: 'Cinzel', serif; color: var(--accent); font-size: 0.65rem; letter-spacing: 0.4em; margin-bottom: 2.5rem; }
-        .question-box { margin-bottom: 4rem; }
+        /* --- 题目页 --- */
+        .step-num { font-family: 'Cinzel', serif; color: var(--accent); font-size: 0.65rem; letter-spacing: 0.4em; margin-bottom: 2.5rem; text-align: left; }
+        .question-box { margin-bottom: 4rem; text-align: left; }
         .question-box h2 { font-size: 1.35rem; line-height: 1.8; font-weight: 400; letter-spacing: 0.05em; text-align: justify; }
-        .annotation { font-size: 0.7rem; color: var(--text-dim); margin-top: 1.5rem; line-height: 1.6; font-weight: 200; padding-left: 1rem; border-left: 1px solid var(--border); display: block; }
+        .annotation { font-size: 0.7rem; color: var(--text-dim); margin-top: 1.5rem; line-height: 1.6; font-weight: 200; padding-left: 1rem; border-left: 1px solid var(--border); display: block; text-align: left; }
         
         .options-list { display: flex; flex-direction: column; gap: 0.1rem; }
-        .opt { padding: 1.4rem 0; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer; font-weight: 300; display: flex; justify-content: space-between; align-items: center; }
+        .opt { padding: 1.4rem 0; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer; font-weight: 300; display: flex; justify-content: space-between; align-items: center; text-align: left; }
         .opt:active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(255,255,255,0.01); }
 
-        /* --- Result Section --- */
+        /* --- 结果页 --- */
         #result-poster { padding: 4rem 1.8rem; background: #000; text-align: left; position: relative; }
         .poster-header { border-bottom: 1px solid var(--border); padding-bottom: 2.5rem; margin-bottom: 3rem; }
         .res-top-label { font-family: 'Inter', sans-serif; font-size: 0.45rem; color: var(--text-dim); letter-spacing: 0.5em; text-transform: uppercase; }
@@ -95,10 +97,9 @@
         .reading-section { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); }
         .reading-title { font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--accent); letter-spacing: 0.05em; font-weight: 400; font-style: italic;}
 
-        /* 二维码占位符：确保不会因为找不到图而显示“破碎图标” */
         .qr-placeholder { margin-top: 5rem; display: flex; flex-direction: column; align-items: center; padding-top: 3rem; border-top: 1px dashed var(--border); }
-        .qr-box { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; }
-        .qr-box img { width: 100%; height: 100%; object-fit: contain; display: none; background: #fff; padding: 4px; }
+        .qr-box { width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fff; padding: 4px; border-radius: 4px;}
+        .qr-box img { width: 100%; height: 100%; object-fit: contain; }
         .qr-hint { font-size: 0.45rem; color: var(--text-dim); letter-spacing: 0.25em; text-transform: uppercase; margin-top: 1rem; }
 
         /* UI Control */
@@ -112,10 +113,10 @@
 <body>
 
     <div class="progress-line" id="progress"></div>
-    <!-- 增加一个手动关闭的“正在加载”屏，防止 JS 没跑完页面就卡住 -->
     <div class="loading-screen" id="loader">PERCEIVING...</div>
 
     <div id="app">
+        <!-- 首页 (修正：添加居中对齐结构) -->
         <section id="home" class="screen">
             <div class="brand">
                 <h1>PHILO.</h1>
@@ -124,9 +125,10 @@
             <div class="hero-text">
                 在日常抉择中，<br>锚定你的思想坐标。
             </div>
-            <button class="btn" style="width: 170px;" onclick="start()">开启审视</button>
+            <button class="btn start-btn" onclick="start()">开启审视</button>
         </section>
 
+        <!-- 题目页 -->
         <section id="quiz" class="screen">
             <div class="step-num" id="q-idx">Step 01 / 20</div>
             <div class="question-box">
@@ -135,6 +137,7 @@
             <div class="options-list" id="q-options"></div>
         </section>
 
+        <!-- 结果页 -->
         <section id="result" class="screen">
             <div id="result-poster">
                 <div class="poster-header">
@@ -162,9 +165,11 @@
                     <span class="section-tag">Required Reading</span>
                     <span class="reading-title" id="res-book">---</span>
                 </div>
+                
+                <!-- 二维码部分：部署 Vercel 后，将你的二维码命名为 wechat-qr.png 放在 public 文件夹 -->
                 <div class="qr-placeholder" data-html2canvas-ignore="true">
                     <div class="qr-box">
-                        <img id="qr-image" src="/wechat-qr.png" alt="QR" onload="this.style.display='block';">
+                        <img id="qr-image" src="/wechat-qr.png" alt="QR" onerror="this.parentElement.style.display='none';">
                     </div>
                     <p class="qr-hint">Scan to Connect / Feedback</p>
                 </div>
@@ -176,31 +181,28 @@
         </section>
     </div>
 
-    <!-- 异步加载截图库，不阻塞首屏渲染 -->
+    <!-- 异步加载截图库，不阻塞渲染 -->
     <script async src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     <script>
-        // 核心保护：脚本加载完成后立即隐藏加载屏
-        window.addEventListener('load', function() {
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('home').classList.add('active');
-        });
+        // 加载逻辑保护
+        window.addEventListener('load', () => hideLoader());
+        setTimeout(() => hideLoader(), 3000); 
 
-        // 容错处理：如果 3 秒后还没加载完，强制关闭加载屏显示内容
-        setTimeout(() => {
+        function hideLoader() {
             const l = document.getElementById('loader');
             if (l.style.display !== 'none') {
                 l.style.display = 'none';
-                document.getElementById('home').classList.add('active');
+                show('home');
             }
-        }, 3000);
+        }
 
         const questions = [
             { q: "清晨第一杯浓咖啡不慎泼向你正在待命的笔记本电脑。在那一秒，你的第一反应：", options: [{ t: "接受现况。损害已发，情绪波动无法修补主板。冷静断电擦拭。", s: { stoicism: 5 } }, { t: "赋予意义。这是一个荒诞的打击，但我可以选择不让它毁掉我的这一天。", s: { existentialism: 5 } }, { t: "溯源分析。我的放置习惯存在逻辑漏洞。评估灾情并记录教训。", s: { rationalism: 5 } }] },
             { q: "如果有一种‘体验机’，能让你在缸中度过绝对幸福、毫无痛苦的一生（虽是虚假），你会：", options: [{ t: "进入。快乐的边际效用即是生命的终极追求，真假并不重要。", s: { utilitarianism: 5 } }, { t: "拒绝。真实的痛苦远比虚假的极乐更有尊严，我追求本体的真。", s: { idealism: 5 } }, { t: "怀疑。谁在维护机器？这种‘快乐’是否只是某种权力的投喂？", s: { postmodernism: 5 } }] },
             { q: "你拥有一枚可以让你在现实中完全隐形的戒指（盖吉氏戒指），你会：", ann: "柏拉图笔下的隐身寓言：当行为不再产生后果，你将臣服于本能，还是恪守德性？", options: [{ t: "依然克制。道德来自于我内心的自律，而非外界的监督。", s: { deontology: 5 } }, { t: "释放本能。既然惩罚契约已失效，我将追求绝对的感官自由。", s: { existentialism: 5 } }, { t: "解构。隐形意味着我退出了全景监狱，观察权力的运作。", s: { postmodernism: 5 } }] },
             { q: "你用了十年的手机，零件被全部更换了一遍，它还是原来那个手机吗（忒修斯之船）？", options: [{ t: "不是。物质实体的连续性已经断裂，它是全新的构造。", s: { empiricism: 5 } }, { t: "是。只要它承载的‘我之物’这一理式核心没有改变。", s: { idealism: 5 } }, { t: "取决于我。‘身份’只是标签，我如何命名它，它就是什么。", s: { postmodernism: 4 } }] },
-            { q: "色盲科学家玛丽研究了关于红色的所有物理数据，当她第一次亲眼看到红色：", options: [{ t: "她学到了新知识。感官经验（Qualia）无法被物理数据穷尽。", s: { empiricism: 5 } }, { t: "她没学到新知识。大脑的电化学反应已在她的逻辑推演之中。", s: { rationalism: 5 } }, { t: "这说明‘红色’只是一种主观建构，并无统一的客观标准。", s: { postmodernism: 5 } }] },
+            { q: "色盲科学家玛丽研究了关于红色的所有物理数据，当她第一次亲眼看到红色：", options: [{ t: "她学到了新知识。感官经验（Qualia）无法被物理数据穷尽。", s: { empiricism: 5 } }, { t: "她没学到新知识。大脑的电化学反应已在她的逻辑推演之中。", s: { rationalism: 5 } }, { t: "这说明‘红色’只是一种主观建构，并无统一标准。", s: { postmodernism: 5 } }] },
             { q: "如果你被告知，传送机在目的地复制了你的原子，但摧毁了这里的你：", options: [{ t: "拒绝。自我的独一无二性在于意识的连续，而非原子的排列。", s: { idealism: 3, deontology: 2 } }, { t: "接受。只要那个‘我’拥有完全相同的记忆，他就是我。", s: { utilitarianism: 5 } }, { t: "无所谓。‘我’本身就是一个不断流动的虚构叙事。", s: { existentialism: 5 } }] },
             { q: "在一场资源极度匮乏的博弈中，背叛可以让你生存，守信则会导致毁灭：", options: [{ t: "守信。我绝不将他人作为生存手段，哪怕这意味着毁灭。", s: { deontology: 5 } }, { t: "背叛。生存是行使一切权利前提，这是生命的本能意志。", s: { existentialism: 5 } }, { t: "博弈分析。寻找一个成本最低的平衡点。", s: { rationalism: 5 } }] },
             { q: "关于‘美’，你的直觉更偏向：", options: [{ t: "美是事物背后永恒的数学比例与和谐理式。", s: { idealism: 5 } }, { t: "美是这一瞬间带给我感官最强烈的颤栗与愉悦。", s: { empiricism: 5 } }, { t: "美是特定时代与权力话语建构出来的审美特权。", s: { postmodernism: 5 } }] },
@@ -235,9 +237,7 @@
         function loadQ() {
             const data = questions[current];
             document.getElementById('q-idx').innerText = `ARCHIVE ${String(current + 1).padStart(2, '0')} / 20`;
-            let qHtml = `<h2>${data.q}</h2>`;
-            if (data.ann) qHtml += `<span class="annotation">${data.ann}</span>`;
-            document.getElementById('q-content').innerHTML = qHtml;
+            document.getElementById('q-content').innerHTML = `<h2>${data.q}</h2>` + (data.ann ? `<span class="annotation">${data.ann}</span>` : "");
             const cont = document.getElementById('q-options');
             cont.innerHTML = '';
             data.options.forEach(o => {
@@ -255,39 +255,34 @@
             if(current < questions.length) {
                 const q = document.getElementById('quiz');
                 q.style.opacity = 0;
-                setTimeout(() => { loadQ(); q.style.opacity = 1; }, 400);
+                setTimeout(() => { loadQ(); q.style.opacity = 1; }, 300);
             } else { showResult(); }
         }
         function showResult() {
             document.getElementById('progress').style.width = '100%';
-            const sortedKeys = Object.keys(score).sort((a, b) => (score[b] || 0) - (score[a] || 0));
-            const primaryKey = sortedKeys[0] || 'existentialism';
-            const secondaryKey = sortedKeys[1] || 'stoicism';
-            
-            const resPrimary = icons[primaryKey];
-            const resSecondary = icons[secondaryKey];
+            const sorted = Object.keys(score).sort((a, b) => score[b] - score[a]);
+            const primary = icons[sorted[0]] || icons.existentialism;
+            const secondary = icons[sorted[1]] || icons.stoicism;
 
-            document.getElementById('res-name').innerText = resPrimary.name;
-            document.getElementById('res-school').innerText = resPrimary.school;
-            document.getElementById('dim-1').innerText = resPrimary.dim[0];
-            document.getElementById('dim-2').innerText = resPrimary.dim[1];
-            document.getElementById('dim-3').innerText = resPrimary.dim[2];
-            document.getElementById('res-sub-name').innerText = resSecondary.name;
-            document.getElementById('res-sub-school').innerText = resSecondary.school;
-            document.getElementById('res-desc').innerText = resPrimary.condensed;
-            document.getElementById('res-book').innerText = resPrimary.book;
-            
+            document.getElementById('res-name').innerText = primary.name;
+            document.getElementById('res-school').innerText = primary.school;
+            document.getElementById('dim-1').innerText = primary.dim[0];
+            document.getElementById('dim-2').innerText = primary.dim[1];
+            document.getElementById('dim-3').innerText = primary.dim[2];
+            document.getElementById('res-sub-name').innerText = secondary.name;
+            document.getElementById('res-sub-school').innerText = secondary.school;
+            document.getElementById('res-desc').innerText = primary.condensed;
+            document.getElementById('res-book').innerText = primary.book;
             show('result');
         }
         function show(id) {
-            const screens = document.querySelectorAll('.screen');
-            screens.forEach(s => {
+            document.querySelectorAll('.screen').forEach(s => {
                 s.classList.remove('active');
                 s.style.display = 'none';
             });
             const target = document.getElementById(id);
             target.style.display = 'flex';
-            setTimeout(() => { target.classList.add('active'); }, 50);
+            setTimeout(() => target.classList.add('active'), 50);
             window.scrollTo(0,0);
         }
         function savePoster() {
@@ -298,10 +293,7 @@
             const loader = document.getElementById('loader');
             loader.innerText = "PREPARING...";
             loader.style.display = 'flex';
-            
-            html2canvas(document.getElementById('result-poster'), { 
-                backgroundColor: '#000', scale: 2, logging: false, useCORS: true 
-            }).then(canvas => {
+            html2canvas(document.getElementById('result-poster'), { backgroundColor: '#000', scale: 2, useCORS: true }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `PHILO_ARCHIVE.png`;
                 link.href = canvas.toDataURL('image/png');
@@ -309,7 +301,7 @@
                 loader.style.display = 'none';
             }).catch(() => {
                 loader.style.display = 'none';
-                alert("生成失败，请长按截图保存");
+                alert("生成失败，请尝试长按手动截图");
             });
         }
     </script>
