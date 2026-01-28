@@ -52,58 +52,61 @@
             display: flex; flex-direction: column; opacity: 1; transform: translateY(0);
         }
 
-        /* --- 首页：完美居中 --- */
-        #home { justify-content: center; align-items: center; text-align: center; }
+        /* --- 首页：绝对居中与经典引言 --- */
+        #home { 
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center; 
+            text-align: center; height: 100%;
+        }
         .brand { margin-bottom: 4rem; }
         .brand h1 { font-family: 'Cinzel', serif; font-size: 3.2rem; letter-spacing: 0.25em; color: var(--accent); line-height: 1; }
         .brand p { font-family: 'Inter', sans-serif; font-size: 0.55rem; letter-spacing: 0.8em; color: var(--text-dim); text-transform: uppercase; margin-top: 1.5rem; text-indent: 0.8em; }
-        .hero-text { font-size: 1.05rem; line-height: 2.8; font-weight: 200; letter-spacing: 0.22em; margin-bottom: 5rem; color: #bbb; }
+        .hero-text { font-size: 1.15rem; line-height: 2.8; font-weight: 200; letter-spacing: 0.25em; margin-bottom: 5.5rem; color: #bbb; }
         .btn { background: none; border: 1px solid var(--accent); color: var(--accent); padding: 1.1rem; font-family: 'Inter', sans-serif; font-size: 0.6rem; letter-spacing: 0.45em; text-transform: uppercase; cursor: pointer; transition: 0.4s; outline: none; }
         .btn:active { background: var(--accent); color: #000; transform: scale(0.95); }
+        .start-btn { margin: 0 auto; width: 170px; }
 
-        /* --- 答题页：精密间距 --- */
+        /* --- 答题页：精密节奏 --- */
         #quiz { padding-top: 10vh; }
         .step-num { font-family: 'Cinzel', serif; color: var(--accent); font-size: 0.6rem; letter-spacing: 0.5em; margin-bottom: 3rem; opacity: 0.6; }
-        .question-box { margin-bottom: 3rem; }
+        .question-box { margin-bottom: 3rem; } /* 题目与选项锁定 3rem */
         .question-box h2 { font-size: 1.05rem; line-height: 2; font-weight: 300; letter-spacing: 0.05em; color: #f0f0f0; }
         .annotation { font-size: 0.68rem; color: #666; margin-top: 1.5rem; line-height: 1.8; font-weight: 200; padding-left: 1rem; border-left: 1px solid var(--border); display: block; }
         
-        .options-list { display: flex; flex-direction: column; gap: 0.1rem; }
+        .options-list { display: flex; flex-direction: column; gap: 0.2rem; }
         .opt { padding: 1.4rem 0.8rem; font-size: 0.88rem; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer; font-weight: 300; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; line-height: 1.6; }
         .opt:active { transform: scale(0.97); color: var(--accent); background: rgba(184, 156, 109, 0.05); }
         .opt::after { content: '⌞'; font-size: 0.8rem; opacity: 0; color: var(--accent); }
         .opt:active::after { opacity: 1; }
 
-        /* --- 结果页：优化后的结构化排版 --- */
-        #result-poster { padding: 4rem 1.5rem; background: #000; position: relative; }
+        /* --- 结果页：增加横向呼吸感 --- */
+        #result-poster { padding: 4rem 2.2rem; background: #000; position: relative; } /* Padding 增加 */
         
-        /* 顶部档案头：缩小底部边距以靠近正文 */
-        .archive-header { margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 2rem; }
+        .archive-header { margin-bottom: 2.2rem; border-bottom: 1px solid var(--border); padding-bottom: 2rem; }
         .res-top-label { font-family: 'Inter', sans-serif; font-size: 0.45rem; color: var(--text-dim); letter-spacing: 0.4em; text-transform: uppercase; margin-bottom: 1.2rem; display: block; }
         .res-main-name { font-size: 3.5rem; color: var(--accent); font-weight: 700; line-height: 1; letter-spacing: -0.01em; margin-bottom: 0.5rem; }
         .res-main-school { font-size: 0.72rem; color: var(--accent); letter-spacing: 0.35em; font-weight: 200; text-transform: uppercase; opacity: 0.7; }
         
-        /* 名言盒子：收紧间距 */
-        .res-quote-box { margin: 2rem 0 0.5rem 0; position: relative; padding: 0.5rem 1rem; }
-        .res-quote { font-size: 0.92rem; color: #ccc; font-style: italic; line-height: 1.9; letter-spacing: 0.05em; }
+        .res-quote-box { margin: 1.8rem 0 0.8rem 0; position: relative; padding: 0.5rem 1rem; }
+        .res-quote { font-size: 0.92rem; color: #ccc; font-style: italic; line-height: 1.8; letter-spacing: 0.05em; }
         .res-quote-box::before { content: ""; position: absolute; left: 0; top: 0; width: 1.5px; height: 100%; background: var(--accent); opacity: 0.4; }
 
-        .analysis-block { margin-bottom: 3rem; }
-        .section-tag { font-family: 'Inter', sans-serif; font-size: 0.48rem; color: var(--text-dim); letter-spacing: 0.5em; text-transform: uppercase; margin-bottom: 1.2rem; display: block; }
+        .analysis-block { margin-bottom: 3.2rem; }
+        .section-tag { font-family: 'Inter', sans-serif; font-size: 0.48rem; color: var(--text-dim); letter-spacing: 0.5em; text-transform: uppercase; margin-bottom: 1.1rem; display: block; }
         .analysis-body { font-size: 0.88rem; line-height: 2.2; color: #a0a0a0; font-weight: 300; text-align: justify; white-space: pre-wrap; letter-spacing: 0.03em; }
 
-        .reading-box { margin-bottom: 3rem; padding: 1.2rem; border: 1px solid rgba(184, 156, 109, 0.06); background: rgba(255,255,255,0.01); }
-        .reading-title { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--accent); font-style: italic; margin-top: 0.5rem; display: block; }
+        .reading-box { margin-bottom: 3.2rem; padding: 1.2rem; border: 1px solid rgba(184, 156, 109, 0.06); background: rgba(255,255,255,0.01); }
+        .reading-title { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--accent); font-style: italic; margin-top: 0.4rem; display: block; }
 
-        .secondary-archive-box { margin-bottom: 3rem; padding-top: 2rem; border-top: 1px dashed var(--border); }
+        .secondary-archive-box { margin-bottom: 3.2rem; padding-top: 2.2rem; border-top: 1px dashed var(--border); }
         .res-secondary-name { font-size: 1.5rem; color: #888; margin-bottom: 0.3rem; font-weight: 400; }
-        .res-secondary-school { font-size: 0.58rem; color: #666; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 1rem; display: block; }
-        .res-secondary-desc { font-size: 0.82rem; line-height: 1.9; color: #555; font-weight: 300; text-align: justify; }
+        .res-secondary-school { font-size: 0.58rem; color: #666; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 1.2rem; display: block; }
+        .res-secondary-desc { font-size: 0.82rem; line-height: 1.9; color: #555; font-weight: 300; }
 
         .copyright-tag { margin-top: 4rem; font-family: 'Inter', sans-serif; font-size: 0.5rem; color: var(--text-dim); letter-spacing: 0.25em; text-align: center; opacity: 0.5; }
 
-        .qr-footer { margin-top: 3rem; display: flex; flex-direction: column; align-items: center; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.03); }
-        .qr-box { width: 90px; height: 90px; background: #fff; padding: 5px; }
+        .qr-footer { margin-top: 3.5rem; display: flex; flex-direction: column; align-items: center; padding-top: 2.5rem; border-top: 1px solid rgba(255,255,255,0.03); }
+        .qr-box { width: 95px; height: 95px; background: #fff; padding: 5px; }
         .qr-box img { width: 100%; height: 100%; object-fit: contain; }
         
         .loading-screen { position: fixed; inset: 0; background: #080808; display: flex; justify-content: center; align-items: center; z-index: 2000; color: var(--accent); font-family: 'Cinzel'; letter-spacing: 0.6em; font-size: 0.7rem; }
@@ -112,19 +115,19 @@
 <body>
 
     <div class="progress-line" id="progress"></div>
-    <div class="loading-screen" id="loader">PERCEIVING...</div>
+    <div class="loading-screen" id="loader">CONCEPTUALIZING...</div>
 
     <div id="app">
-        <!-- 首页 -->
+        <!-- 首页：Catchy Intro -->
         <section id="home" class="screen">
             <div class="brand">
                 <h1>PHILO.</h1>
                 <p>Pure Philosophical Coordinates</p>
             </div>
             <div class="hero-text">
-                在日常抉择中，<br>锚定你的思想坐标。
+                在碎片的时代，<br>重拾思辨的尊严。
             </div>
-            <button class="btn" style="width: 170px;" onclick="start()">开启审视</button>
+            <button class="btn start-btn" onclick="start()">开启审视</button>
         </section>
 
         <!-- 答题页 -->
@@ -134,7 +137,7 @@
             <div class="options-list" id="q-options"></div>
         </section>
 
-        <!-- 结果页 -->
+        <!-- 结果页：增加内边距提升呼吸感 -->
         <section id="result" class="screen">
             <div id="result-poster">
                 <div class="archive-header">
@@ -165,6 +168,7 @@
                 
                 <div class="qr-footer" data-html2canvas-ignore="true">
                     <div class="qr-box">
+                        <!-- 二维码预留位 -->
                         <img id="qr-image" src="/xhs-qr.png" alt="XHS QR" onerror="this.parentElement.style.display='none';">
                     </div>
                     <p style="font-size: 0.45rem; color: var(--text-dim); margin-top: 1rem; letter-spacing: 0.3em;">XHS: 云树CLOUDTREE</p>
@@ -185,6 +189,7 @@
             show('home');
         });
 
+        // 22道智性命题
         const questions = [
             { q: "‘玛丽的房间’实验：一位色盲科学家掌握了光的所有物理数据，当她第一次看到红色：", options: [{ t: "她学到了新知识，物理规律无法穷尽主观体验（Qualia）。", s: { murdoch: 4, hume: 3 } }, { t: "她没学到新知识，大脑的电化学反应已在她的逻辑推演中。", s: { descartes: 5 } }, { t: "这说明世界本身即是感知的集合。", s: { hume: 5 } }] },
             { q: "传送机在月球摧毁并重建一个完美的你，你认为进入舱体意味着：", options: [{ t: "死亡。意识的物理连续性一旦断裂，自我便已消亡。", s: { descartes: 5 } }, { t: "存续。既然记忆和人格知觉一致，‘我’的本质未变。", s: { hume: 5 } }, { t: "存续。身体只是工具，那个‘我’能继续行动才重要。", s: { arendt: 5 } }] },
@@ -194,9 +199,9 @@
             { q: "失控的电车前，如果你不作为会死5人，拉动闸门会死1人（此人是你挚爱）：", options: [{ t: "拉闸。个体必须为最大化整体幸福而承受牺牲。", s: { mill: 5 } }, { t: "不拉。我拒绝将人仅仅作为达成某种结果的工具。", s: { kant: 5 } }, { t: "这种道德困境的本质在于对我者命运的‘凝视’。", s: { murdoch: 5 } }] },
             { q: "关于‘美’，你更认可哪种直觉？", options: [{ t: "美是万物背后永恒和谐的数学/理式比例。", s: { plato: 5 } }, { t: "美是我放下自我的贪婪，纯粹关注他者的无私瞬间。", s: { murdoch: 5 } }, { t: "美是生命意志在荒芜中创造出的英雄式幻象。", s: { nietzsche: 5 } }] },
             { q: "如果你拥有‘盖吉氏戒指’：", ann: "柏拉图的思想实验：一枚能让你完全隐形且行事绝不被惩罚、被发现的戒指。", options: [{ t: "依然恪守道德。道德源于自律，而非外界的监督。", s: { kant: 5 } }, { t: "释放本能。既然契约失效，我将追求绝对自由。", s: { nietzsche: 5 } }, { t: "这让我审视权力如何通过‘监控’维持人的秩序感。", s: { arendt: 3, beauvoir: 2 } }] },
-            { q: "帕斯卡的赌注：关于上帝（或终极信仰），如果无法证明真伪，你会：", options: [{ t: "选择相信。如果赢了获得无限，输了也无损失，这是理性的。", s: { descartes: 4, mill: 2 } }, { t: "拒绝盲信。诚实的怀疑远比功利的相信更有尊严。", s: { hume: 5 } }, { t: "亲手赋予生命某种神圣的意志，哪怕它是虚构的。", s: { nietzsche: 5 } }] },
+            { q: "帕斯卡的赌注：关于终极信仰，如果无法证明真伪，你会：", options: [{ t: "选择相信。如果赢了获得无限，输了也无损失，这是理性的。", s: { descartes: 4, mill: 2 } }, { t: "拒绝盲信。诚实的怀疑远比功利的相信更有尊严。", s: { hume: 5 } }, { t: "亲手赋予生命某种神圣的意志，哪怕它是虚构的。", s: { nietzsche: 5 } }] },
             { q: "AI写出了一首让全人类落泪的诗，你会认为：", options: [{ t: "它是美的。只要符合美的理式，来源并不重要。", s: { plato: 5 } }, { t: "它是虚假的。因为它缺乏主体的生存体验和选择。", s: { beauvoir: 5 } }, { t: "它没有‘灵魂’。因为它不具备原发的‘行动’能力。", s: { arendt: 5 } }] },
-            { q: "尼采的‘永恒轮回’：如果你的一生要不断地重复，你会：", options: [{ t: "恐慌。这种无尽的循环是虚虚无主义的噩梦。", s: { hume: 3 } }, { t: "接纳。以此确立我每一刻选择的绝对分量。", s: { nietzsche: 5 } }, { t: "寻找那个在任何轮回中都恒定不变的真理。", s: { plato: 5 } }] },
+            { q: "尼采的‘永恒轮回’：如果你的一生要不断地重复，你会：", options: [{ t: "恐慌。这种无尽的循环是虚无主义的噩梦。", s: { hume: 3 } }, { t: "接纳。以此确立我每一刻选择的绝对分量。", s: { nietzsche: 5 } }, { t: "寻找那个在任何轮回中都恒定不变的真理。", s: { plato: 5 } }] },
             { q: "你最认可的人生态度是：", options: [{ t: "在绝对怀疑中寻找唯一的确定支点。", s: { descartes: 5 } }, { t: "顺应自然的秩序，区分什么是‘可控的’。", s: { aurelius: 5 } }, { t: "在荒谬的世界中，通过不断超越旧我来创造新自我。", s: { nietzsche: 5, beauvoir: 3 } }] },
             { q: "‘忒修斯之船’：如果一艘船的木板被全部更换，它还是原来那艘吗？", options: [{ t: "是。它承载的‘灵魂’或设计蓝图未变。", s: { plato: 5 } }, { t: "不是。物理实体的连续性已被新物质取代。", s: { hume: 4 } }, { t: "它是一个不断生成的‘动态过程’，身份是人为赋予的标签。", s: { beauvoir: 5 } }] },
             { q: "面对不公正的压迫，你应该：", options: [{ t: "通过反抗，在具体的生存处境中确认我的自由。", s: { beauvoir: 5 } }, { t: "走入公共领域，与志同道合者共同改变世界。", s: { arendt: 5 } }, { t: "保持内心的主权，使外界的暴力无法伤害我的宁静。", s: { aurelius: 5 } }] },
@@ -207,19 +212,19 @@
             { q: "西西弗斯推石上山是徒劳的，但他是幸福的。这意味着：", options: [{ t: "幸福在于对无意义过程的主动肯定。", s: { nietzsche: 5 } }, { t: "幸福在于看透了虚无，进而获得绝对的冷静。", s: { aurelius: 4 } }, { t: "幸福在于每一次微小的感官知觉都是真实的获得。", s: { hume: 3 } }] },
             { q: "你如何定义‘一个成功的生命’？", options: [{ t: "最大程度减轻了人类总体的痛苦（减熵）。", s: { mill: 5 } }, { t: "在死亡面前能满怀激情地再次肯定自己的一生。", s: { nietzsche: 5 } }, { t: "完成了‘灵魂转向’，从影子世界回到了太阳底下。", s: { plato: 5 } }] },
             { q: "生活如果失去了目标，你：", options: [{ t: "依靠日常的习惯和本能平稳度日，不问终点。", s: { hume: 5 } }, { t: "亲手凿出一份意义，并为此负责。", s: { nietzsche: 5, beauvoir: 3 } }, { t: "在对他人的责任与纯粹的‘关注’中重新扎根。", s: { murdoch: 5 } }] },
-            { q: "终极实验：如果宇宙明天毁灭且一切痕迹消失，你今天行善的唯一动力是：", options: [{ t: "因为行善本身就是绝对正确的理性法则。", s: { kant: 5 } }, { t: "这是我作为一个自由主体，在最后时刻对自己命运的肯定。", s: { beauvoir: 5 } }, { t: "仅仅是为了在虚无降临前，给予那个人最后一份纯粹的关注。", s: { murdoch: 5 } }] }
+            { q: "终极实验：如果宇宙明天毁灭且一切痕迹消失，你行善的唯一动力是：", options: [{ t: "因为行善本身就是绝对正确的理性法则。", s: { kant: 5 } }, { t: "这是我作为一个自由主体，在最后时刻对自己命运的肯定。", s: { beauvoir: 5 } }, { t: "仅仅是为了在虚无降临前，给予那个人最后一份纯粹的关注。", s: { murdoch: 5 } }] }
         ];
 
         const icons = {
-            nietzsche: { name: "尼采", school: "Tragedy Heroism / 意志", condensed: "你拒绝在虚无中沉沦。对你而言，生活不是给定任务，而是一场永恒的自我跃迁。你在荒谬的真相中舞动，以意志为刃劈开真理。你深知：每一个不曾起舞的日子，都是对生命的辜负。", book: "《查拉图斯特拉如是说》", quote: "“那不能杀死我的，使我更强大。”", subDesc: "这种生命意志不仅是对痛苦的克服，更是对自我潜能的深度挖掘。它平衡了你性格中可能存在的妥协，促使你在废墟中建立起自己的价值神庙。在你眼中，强者并非统治他人，而是统治自己的平庸。" },
+            nietzsche: { name: "尼采", school: "Existentialism / 意志", condensed: "你拒绝在虚无中沉沦。对你而言，生活不是给定任务，而是一场永恒的自我跃迁。你在荒谬的真相中舞动，以意志为刃劈开真理。你深知：每一个不曾起舞的日子，都是对生命的辜负。", book: "《查拉图斯特拉如是说》", quote: "“那不能杀死我的，使我更强大。”", subDesc: "这种生命意志不仅是对痛苦的克服，更是对自我潜能的深度挖掘。它平衡了你性格中可能存在的妥协，促使你在废墟中建立起自己的价值神庙。在你眼中，强者并非统治他人，而是统治自己的平庸。" },
             aurelius: { name: "马可·奥勒留", school: "Stoicism / 坚韧", condensed: "你具备区分『可控』与『不可控』的智慧。在喧嚣动荡的世界中，你选择在内心筑起一座不陷的堡垒。你视理性为最高指挥官，在万物的流转中守望着一份罕见的宁静。", book: "《沉思录》", quote: "“最好的报复是不像你的敌人。”", subDesc: "这种坚韧的底色让你在追求理想的同时，不至于被外界的偶然成败所轻易摧毁。它教会你在纷乱的信息流中识别本质，维持精神的绝对稳态与内在尊严。它为你提供了一处静谧的避风港，使你成为乱局中的锚点。" },
             kant: { name: "康德", school: "Deontology / 纯粹理性", condensed: "你是一个灵魂的立法者。你视道德为绝对的自律，相信头顶的星空和心中的道德律是人类唯一神圣的坐标。你严谨而专注，始终将人视为终极目的而非手段，在逻辑的疆界中捍卫尊严。", book: "《纯粹理性批判》", quote: "“位我上者，灿烂星空；道德律令，在我心中。”", subDesc: "这层逻辑屏障保护你免受感官冲动的误导，确立了你作为独立行为者的尊严。无论环境如何变化，这种对法则的敬畏让你在动荡中依然保有不被撼动的人格完整性。它是你思想的定海神针，确保你的行动始终符合理性的航道。" },
             descartes: { name: "笛卡尔", school: "Rationalism / 逻辑", condensed: "你是思想的建筑师，信奉逻辑穿透表象的力量。怀疑是你的武器，你在绝对怀疑的废墟上重建认知的几何大厦。你坚信『我思』是宇宙认知的基石，在明晰中寻找精神与真理的统一。", book: "《第一哲学沉思录》", quote: "“我思，故我在。”", subDesc: "它确保你在探索真理时始终保有一双冷静、审视的眼睛。这种清醒的怀疑能力让你能看透表象的迷雾，在混乱中寻找最明晰的思想基石。它不仅优化了你的认知效率，更在本体论层面为你提供了一个不可动摇的逻辑支撑。" },
             plato: { name: "柏拉图", school: "Idealism / 理式", condensed: "你是永恒的追光者。你认为喧嚣的感官世界仅仅是投影在洞穴壁画上的影子，真正的终极意义只存在于超越表象的绝对精神之中。你的一生都在试图完成一场灵魂的转向，向理式高度攀爬。", book: "《理想国》", quote: "“世界只是影子的影子。”", subDesc: "它引导你不断向着更高的真理进发，避免沉溺于眼前的琐碎与虚无。这种超越性为你日常的生活注入了神圣的理想光芒，让灵魂在琐碎的现实中不致枯萎。它赋予了你一种审视全局的视野，在追寻完美的路上永不停歇。" },
-            hume: { name: "大卫·休谟", school: "Empiricism / 经验", condensed: "你只相信感官带给你的证明。你拒绝一切超验的空中楼阁，承认认知的局限。你以谦卑而务实的姿态拥抱世界的复杂，在流变的现象中深耕出最坚实、最人性的人生常识。", book: "《人类理智研究》", quote: "“理性是感悟的奴隶。”", subDesc: "这种地面视角纠正了你可能存在的超验幻想，让你学会与具体而复杂的现实和谐共处。它教会你在流动的经验中建立起某种富有弹性的人性常识，在不确定性中寻找生活的最优解。它是一种温柔的怀疑，保护你免受极端教条的侵害。" },
+            hume: { name: "大卫·休谟", school: "Empiricism / 经验", condensed: "你只相信感官带给你的证明。你拒绝一切超验的空中楼阁，承认认知的局限。你以谦卑而务实的姿态拥抱世界的复杂，在流变的现象中深耕出最坚实、最人性的人生常识。", book: "《人类理智研究》", quote: "“理性是感性的奴隶。”", subDesc: "这种地面视角纠正了你可能存在的超验幻想，让你学会与具体而复杂的现实和谐共处。它教会你在流动的经验中建立起某种富有弹性的人性常识，在不确定性中寻找生活的最优解。它是一种温柔的怀疑，保护你免受极端教条的侵害。" },
             mill: { name: "穆勒", school: "Utilitarianism / 务实", condensed: "你是一个理性的务实派。你追求最大多数人的幸福，将正义转化为可感的、普惠的社会现实。你在冷静的效用计算中，包裹着对人类苦难最切近的温润关怀，追求理性的善良。", book: "《功利主义》", quote: "“做一个痛苦的人，胜过做一只快乐的猪。”", subDesc: "这种现实主义的底色让你在沉溺于纯粹思辨之余，不忘关注真实的苦难与福祉。它平衡了理论的冷峻，为你的逻辑判断注入了温润的同情心。它让你在复杂的社会博弈中，始终能找到那条最有利于人类整体提升的行动路线。" },
-            arendt: { name: "汉娜·阿伦特", school: "Action / 政治哲学", condensed: "你拒绝孤独的沉思，拥抱共同体。你认为人的卓越在于『行动』与『言说』。你致力于在多元的世界中开辟公共空间，坚信人的第二次出生是在公共领域的登场，在自由的博弈中塑造人的尊严。", book: "《人的境况》", quote: "“平庸之恶是世界面临的最严重威胁。”", subDesc: "它为你开启了广阔的公共视野，提醒你思想的终点不在于孤独的冥想。这股力量推动你走出自我，在与他者的连接中确认真实的尊严。它让你意识到，个体的自由唯有在与他人共同构建的世界中，才能获得真正的生命力。" },
-            beauvoir: { name: "波伏娃", school: "Existential / 自由", condensed: "你深知『存在先于本质』。你认为人不是某种现成品，而是一个不断超越自我的开放过程。你在具体的人际关系中实践自由，追求一种能确认自我的生存辩证法。", book: "《第二性》", quote: "“一个人不是生而为，而是变成。”", subDesc: "这种强调动态生成的自由意志，让你拒绝被任何既定的标签所囚禁。它补充了你性格中的反叛精神，让你在复杂的关系中始终握有实践自由的主权。它赋予你一种勇气，去拒绝那些试图定义你的外部力量，活出真正属于自我的可能。" },
+            arendt: { name: "汉娜·阿伦特", school: "Political Philosophy / 政治哲学", condensed: "你拒绝孤独的沉思，拥抱共同体。你认为人的卓越在于『行动』与『言说』。你致力于在多元的世界中开辟公共空间，坚信人的第二次出生是在公共领域的登场，在自由的博弈中塑造人的尊严。", book: "《人的境况》", quote: "“思索是不幸发生时的避难所，行动是抵抗平庸的途径。”", subDesc: "它为你开启了广阔的公共视野，提醒你思想的终点不在于孤独的冥想。这股力量推动你走出自我，在与他者的连接中确认真实的尊严。它让你意识到，个体的自由唯有在与他人共同构建的世界中，才能获得真正的生命力。" },
+            beauvoir: { name: "波伏娃", school: "Existentialism / 存在主义", condensed: "你深知『存在先于本质』。你认为人不是某种现成品，而是一个不断超越自我的开放过程。你在具体的人际关系中实践自由，追求一种能确认自我的生存辩证法。", book: "《第二性》", quote: "“我的生活是实现我自由的过程，也是不断向未来投射存在的过程。”", subDesc: "这种强调动态生成的自由意志，让你拒绝被任何既定的标签所囚禁。它补充了你性格中的反叛精神，让你在复杂的关系中始终握有实践自由的主权。它赋予你一种勇气，去拒绝那些试图定义你的外部力量，活出真正属于自我的可能。" },
             murdoch: { name: "艾里斯·默多克", school: "Realism / 关注", condensed: "你认为道德的核心不在于意志的决断，而在于『关注』的质量。你追求一种无私的视野，试图剥离自我的幻觉去洞穿真相。美对你而言是道德的预演，引导灵魂向着那个不可定义的‘善’。", book: "《主权与向善》", quote: "“艺术是剥离自我的练习。”", subDesc: "这种对他者的极度凝视平衡了主体的过度扩张，让你学会放下偏见去辨认真相。它为你原本理性的精神世界引入了一抹灵性的宁静与慈悲。在这种无私的凝视中，你将学会如何真正地去爱，并从这种爱中汲取穿透伪善的智慧。" }
         };
 
