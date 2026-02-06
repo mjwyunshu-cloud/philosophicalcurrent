@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PHILO | 精神原型测试 2.1.2</title>
+    <title>PHILO | 精神原型测试 2.1.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+SC:wght@200;300;400;500;700;900&family=Inter:wght@100;200;300;400;500;600;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
@@ -12,11 +12,11 @@
             --secondary: #cfceff; /* 辅色：柔紫蓝 */
             --danger: #f7514f;    /* 核心操作：珊瑚红 */
             --success: #4fbf5a;   /* 确认：活力绿 */
+            --ref-bg: #f2faf3;    /* 思想参考背景：浅绿 */
             --text-main: #28352c; /* 深林墨绿 */
             --text-dim: #9aa59e;
             --card-bg: #ffffff;
             --grad-soft: linear-gradient(135deg, rgba(247, 81, 79, 0.12) 0%, rgba(207, 206, 255, 0.12) 100%);
-            --grad-green: linear-gradient(135deg, rgba(79, 191, 90, 0.12) 0%, rgba(207, 206, 255, 0.12) 100%);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -83,31 +83,32 @@
             position: relative;
             border-radius: 4px;
         }
-        .opt.selected { border: 1.5px solid var(--success); box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+        .opt.selected { border: 1.5px solid var(--success); box-shadow: 0 5px 15px rgba(0,0,0,0.02); background: #fdfdfd; }
         .opt.dimmed { opacity: 0.6; transform: scale(0.98); }
         
-        /* 思想参考容器：仿截图暗色风格 */
+        /* 思想参考容器：升级为浅绿色柔和风格 */
         .opt-ref-box {
             max-height: 0;
             overflow: hidden;
-            font-size: 0.75rem;
+            font-size: 0.78rem;
             line-height: 1.7;
-            color: #ffffff;
-            background: #2b352e;
-            transition: all 0.5s ease;
+            color: var(--text-main);
+            background: var(--ref-bg);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             opacity: 0;
             margin-top: 0;
             border-radius: 4px;
         }
         .opt.selected .opt-ref-box { 
-            max-height: 300px; 
+            max-height: 400px; 
             opacity: 1; 
             margin-top: 1rem; 
-            padding: 1rem;
+            padding: 1.2rem;
+            border-left: 3px solid var(--success);
         }
-        .ref-tag { font-weight: 800; color: var(--success); display: block; margin-bottom: 0.4rem; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        .ref-tag { font-weight: 800; color: var(--success); display: block; margin-bottom: 0.5rem; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.15em; }
 
-        .next-btn-container { margin-top: 2.5rem; display: flex; justify-content: flex-end; opacity: 0; transform: translateY(10px); transition: 0.4s; pointer-events: none; padding-bottom: 5vh; }
+        .next-btn-container { margin-top: 2rem; display: flex; justify-content: flex-end; opacity: 0; transform: translateY(10px); transition: 0.4s; pointer-events: none; padding-bottom: 8vh; }
         .next-btn-container.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
         .btn-next { background: var(--text-main); color: white; border: none; padding: 1rem 2.8rem; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; font-weight: 800; cursor: pointer; border-radius: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .btn-next:active { transform: scale(0.95); }
@@ -130,8 +131,9 @@
         .analysis-section { background: linear-gradient(to bottom, transparent, rgba(207, 206, 255, 0.08)); padding: 2rem 0; margin-bottom: 3.5rem; }
         .analysis-text { font-size: 0.98rem; line-height: 2.6; color: var(--text-main); font-weight: 300; text-align: justify; letter-spacing: 0.03em; }
         .keyword { color: var(--danger); border-bottom: 2px solid rgba(247, 81, 79, 0.25); cursor: help; font-weight: 500; }
-        .book-box { background: var(--grad-green); padding: 2rem 1.8rem; margin-bottom: 1rem; border-radius: 2px; }
-        .copyright-tag { margin-top: 4rem; font-family: 'Inter'; font-size: 0.45rem; color: var(--text-main); text-align: center; padding-bottom: 50px; text-transform: uppercase; letter-spacing: 0.4em; font-weight: 800; opacity: 0.4; }
+        .book-box { background: linear-gradient(135deg, rgba(79, 191, 90, 0.1) 0%, rgba(207, 206, 255, 0.1) 100%); padding: 2rem 1.8rem; margin-bottom: 1rem; border-radius: 2px; }
+        .book-box h4 { font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.6rem; font-family: 'Cinzel'; font-weight: 800; }
+        .book-box p { font-size: 0.85rem; color: var(--text-main); line-height: 1.8; opacity: 0.7; font-weight: 300; }
 
         /* 网页专属二维码区域 */
         .qr-web-only { margin-top: 3rem; display: flex; flex-direction: column; align-items: center; padding: 4rem 0; border-top: 1px solid rgba(0,0,0,0.05); }
@@ -139,8 +141,7 @@
         .qr-web-only .qr-box img { width: 100%; height: 100%; object-fit: cover; }
         .qr-web-only .qr-text { font-family: 'Inter'; font-size: 0.52rem; color: var(--text-main); letter-spacing: 0.2em; text-align: center; line-height: 1.8; text-transform: uppercase; font-weight: 800; opacity: 0.6; }
 
-        #modal { position: fixed; inset: 0; background: rgba(40, 53, 44, 0.95); z-index: 3000; display: none; justify-content: center; align-items: center; padding: 2.5rem; backdrop-filter: blur(12px); }
-        .modal-body { max-width: 380px; padding: 3rem; background: var(--bg); position: relative; border-radius: 4px; box-shadow: 20px 20px 0px var(--danger); }
+        .copyright-tag { margin-top: 4rem; font-family: 'Inter'; font-size: 0.45rem; color: var(--text-main); text-align: center; padding-bottom: 50px; text-transform: uppercase; letter-spacing: 0.4em; font-weight: 800; opacity: 0.4; }
         .loading-screen { position: fixed; inset: 0; background: var(--bg); display: flex; justify-content: center; align-items: center; z-index: 2000; color: var(--text-main); font-family: 'Cinzel'; letter-spacing: 0.8em; font-size: 0.9rem; font-weight: 900; }
     </style>
 </head>
@@ -148,7 +149,7 @@
 
     <svg style="display:none;">
         <filter id="liquidFilter">
-            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.012" numOctaves="3" seed="38" result="noise" />
+            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.012" numOctaves="3" seed="42" result="noise" />
             <feDisplacementMap in="SourceGraphic" in2="noise" scale="100" xChannelSelector="R" yChannelSelector="G" />
         </filter>
     </svg>
@@ -158,7 +159,7 @@
 
     <div id="modal" onclick="closeModal()">
         <div class="modal-body" onclick="event.stopPropagation()">
-            <span class="close-btn" style="position:absolute; top:1rem; right:1.5rem; font-size:2rem; cursor:pointer;" onclick="closeModal()">×</span>
+            <span class="close-btn" style="position:absolute; top:1rem; right:1.5rem; font-size:2rem; cursor:pointer; font-weight:900;" onclick="closeModal()">×</span>
             <h3 id="modal-title" style="margin-bottom:1.2rem; font-weight:800;">---</h3>
             <p id="modal-def" style="font-weight:300; line-height:1.8;">---</p>
         </div>
@@ -167,7 +168,7 @@
     <div id="app">
         <section id="home" class="screen">
             <div class="organic-core"></div>
-            <div class="corner-meta meta-tl">ARCHIVE XX-2026</div>
+            <div class="corner-meta meta-tl">ARCHIVE XXI-2026</div>
             <div class="corner-meta meta-tr">21 COORDINATES</div>
             <div class="corner-meta meta-bl">EST. 2026 PURE THEORY</div>
             <div class="brand"><h1>PHILO.</h1><p>MIND ARCHIVE IDENTIFICATION</p></div>
@@ -196,10 +197,7 @@
                 <div class="data-section"><div class="sec-header"><span class="sec-title">进阶原著推荐 / READINGS</span></div><div id="book-list"></div></div>
                 <div class="copyright-tag">©云树cloudtree // EST. 2026 ARCHIVE</div>
             </div>
-            <div class="qr-web-only">
-                <div class="qr-box"><img src="xhs-qr.png" alt="QR" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=28352c&data=PHILO_XV_TEST';"></div>
-                <p class="qr-text">扫描二维码调取档案库<br>©云树cloudtree // 2026 PROJECT</p>
-            </div>
+            <div class="qr-web-only"><div class="qr-box"><img src="xhs-qr.png" alt="QR" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=28352c&data=PHILO_XV_TEST';"></div><p class="qr-text">扫描二维码调取档案库<br>©云树cloudtree // 2026 PROJECT</p></div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; padding: 1rem 0 10vh; width: 100%;"><button class="btn-main" style="background:var(--secondary); color:var(--text-main); box-shadow:none;" onclick="savePoster()">保存档案</button><button class="btn-main" onclick="resetTest()">重新审视</button></div>
         </section>
     </div>
@@ -218,13 +216,13 @@
 
         const questions = [
             { q: "玛丽在色盲环境中掌握了光学的所有物理数据，当她第一次看到红色：", options: [
-                { t: "她学到了新知识，物理数据无法穷尽感质。", s: { murdoch: 4, hume: 3, wittgenstein: 2 }, ref: "思想参考：这是对物理主义的经典反击。它暗示主观经验中存在着某种‘溢出’，是公式和数据永远无法捕捉的灵魂余数。" },
+                { t: "她学到了新知识，物理数据无法穷尽感质。", s: { murdoch: 4, hume: 3, wittgenstein: 2 }, ref: "思想参考：这是对物理主义的经典反击。它暗示主观经验中存在着某种‘溢出’，是数据永远无法捕捉的灵魂余数。" },
                 { t: "她没学到新知识，物理推演已包含了感官结果。", s: { descartes: 5, spinoza: 3, aristotle: 2 }, ref: "思想参考：坚定的理性主义视角。认为感官只不过是低级的信息接收，只要逻辑链条足够完整，世界在理智面前是全透明的。" },
                 { t: "世界本身只是感知的集合。", s: { hume: 5, socrates: 2 }, ref: "思想参考：休谟式的经验主义。质疑存在任何脱离感知的‘实体’。如果撤掉所有感觉，世界本身也许只是虚无。" }
             ] },
             { q: "传送机在月球重建一个原子级一致的你，你认为进入舱体：", options: [
                 { t: "意味着死亡。意识的连续性断裂，自我便消亡。", s: { descartes: 5, schopenhauer: 2, kant: 2 }, ref: "思想参考：强调意识的连续性与身体的唯一性。认为‘我’不是一组数据，而是一个不可复制的、时空连续的生命节点。" },
-                { t: "意味着存续。内存一致，我即是我。", s: { hume: 5, mill: 2, rawls: 2 }, ref: "思想参考：功能主义观点。认为自我只不过是记忆、性格和情感的综合。只要软件内容一致，硬件（身体）的更换不影响同一性。" },
+                { t: "意味着存续。内存一致，我即是我。", s: { hume: 5, mill: 2, rawls: 2 }, ref: "思想参考：功能主义观点。认为自我只不过是记忆、性格和情感的综合。只要软件内容一致，硬件的更换不影响同一性。" },
                 { t: "意味着一种动态的生成过程。", s: { beauvoir: 5, nietzsche: 3, hegel: 3 }, ref: "思想参考：反本质主义视角。认为并没有一个永恒不变的‘自我’核。每一次毁灭与重建，都是生命在处境中新一轮的‘生成’。" }
             ] },
             { q: "关于‘知识’的来源，你更倾向于哪种解释？", options: [
@@ -235,7 +233,7 @@
             { q: "关于‘正义’，如果你坐在‘无知之幕’后制定规则：", options: [
                 { t: "我会制定保障最弱势群体权利的法则。", s: { rawls: 5, arendt: 3, marx: 4 }, ref: "思想参考：差异原则。当你不知道自己出生是贫是富，最理性的选择是确保社会的‘底线’足够安全。" },
                 { t: "我会追求整体效用的最大化。", s: { mill: 5 }, ref: "思想参考：功利主义。认为正义就是‘最大多数人的最大幸福’。在这种计算中，个体的痛苦有时被视为换取全局利益的代价。" },
-                { t: "正义应是在既定规则下的理性契约。", s: { kant: 5, aristotle: 2 }, ref: "思想参考：契约论。强调程序的正义。正义不是结果的平等，而是每个人都基于理智签署的一套共同行为准则。" }
+                { t: "正义应是在既定规则下的理性契约。", s: { kant: 5, aristotle: 2 }, ref: "思想参考：契约论。强调程序的正义。正义不是结果的平等，而是每个人都基于理智签署的一套不可违背的共同行为准则。" }
             ] },
             { q: "维特根斯坦的甲虫：每个人盒子里有个叫‘甲虫’的东西，语言能传递真相吗？", options: [
                 { t: "不能。语言只是我们玩的一种社会游戏。", s: { wittgenstein: 5, foucault: 3, nietzsche: 2 }, ref: "思想参考：语言游戏论。语言的意义在于它的使用方式，而不是它指向了什么绝对真理。我们只是在共享一套沟通协议。" },
@@ -259,7 +257,7 @@
             ] },
             { q: "西西弗斯推石上山是徒劳的，你认为：", options: [
                 { t: "他在对无意义的过程进行主动肯定时是幸福的。", s: { nietzsche: 5, camus: 5, heidegger: 3 }, ref: "思想参考：西西弗的反抗。通过对虚无的‘肯定’，你成为了你命运的主人。这种幸福是骄傲且强韧的。" },
-                { t: "这种痛苦说明了生命意志的盲目性。", s: { schopenhauer: 5 }, ref: "思想参考：唯意志论。认为生命是一团无理性的欲望，循环推石就是生存的真实缩影。" },
+                { t: "这种痛苦说明了生命意志的盲目性。", s: { schopenhauer: 5 }, ref: "思想参考：唯意志论。认为生命是一团无理性的欲望，满足了即无聊，满足不了即痛苦。循环推石就是生存的真实缩影。" },
                 { t: "幸福在于在必然的规律中寻找内心的宁静。", s: { aurelius: 5, spinoza: 4 }, ref: "思想参考：斯多葛主义。认清推石是不可改变的宇宙律令，在不偏不倚的理性观察中，获得精神的绝对堡垒。" }
             ] },
             { q: "当你面对社会不公时，你的第一反应是：", options: [
@@ -314,7 +312,7 @@
             ] },
             { q: "如果让你对一个恶人行善：", options: [
                 { t: "我会做。行善是我的绝对义务。", s: { kant: 5, aurelius: 3 }, ref: "思想参考：定言令回。善的行为必须具备普遍性。你对他行善，是在维护你自己作为一个理性主体的最高法律。" },
-                { t: "我会做。这是练习‘无私关注’的时刻。", s: { murdoch: 5, socrates: 3 }, ref: "思想参考：关注美德。善不在于结果，而在于那一刻你是否真的‘看见’了那个受苦的灵魂，即便它是邪恶的。" },
+                { t: "我会做。这是练习‘无私关注’他者的时刻。", s: { murdoch: 5, socrates: 3 }, ref: "思想参考：关注美德。善不在于结果，而在于那一刻你是否真的‘看见’了那个受苦的灵魂，即便它是邪恶的。" },
                 { t: "不做。这不符合理性的效用原则。", s: { mill: 5, aristotle: 3 }, ref: "思想参考：中道计算。行善也需要智慧。如果不分黑白，这种善在全局博弈中只会导致恶的增殖。" }
             ] },
             { q: "你认为‘艺术’应该是：", options: [
@@ -463,7 +461,6 @@
             try {
                 document.getElementById('progress').style.width = '100%';
                 const sorted = Object.keys(score).sort((a, b) => score[b] - score[a]);
-                // 增加补全后的 mill 匹配，如果没有匹配到则 fallback
                 const primaryKey = sorted[0] || 'nietzsche';
                 const primary = icons[primaryKey] || icons.nietzsche;
                 
@@ -485,11 +482,13 @@
                 Object.values(icons).forEach(i => { tCont.innerHTML += `<tr><td>${i.name}</td><td>${i.hub.main}</td><td>${i.hub.crit}</td></tr>`; });
                 
                 show('result');
-                renderRadar(primary.radar);
-                renderSpectrums();
+                // 性能优化：延迟渲染图表，防止页面切换动画卡顿
+                setTimeout(() => {
+                    renderRadar(primary.radar);
+                    renderSpectrums();
+                }, 700);
             } catch (e) {
-                console.error("Result generation failed:", e);
-                // 极端情况下的静默兜底显示结果
+                console.error("Critical: Result generation failed", e);
                 show('result');
             }
         }
@@ -511,6 +510,7 @@
                     }]
                 },
                 options: {
+                    animation: { duration: 1500, easing: 'easeOutQuart' },
                     scales: { r: { grid: { color: 'rgba(0,0,0,0.05)' }, angleLines: { color: 'rgba(0,0,0,0.05)' }, ticks: { display: false }, suggestedMin: 0, suggestedMax: 10 } },
                     plugins: { legend: { display: false } }
                 }
