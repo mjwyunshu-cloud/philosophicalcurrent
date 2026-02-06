@@ -2,544 +2,305 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>镜像之思 | 女哲学家探测报告</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;500;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PHILO | 精神原型测试</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+SC:wght@200;300;400;500;700;900&family=Inter:wght@100;200;300;400&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg-paper: #FBFCFA;
-            --charcoal: #302D2D;
-            --teal: #169cb2;
-            --border-fine: rgba(48, 45, 45, 0.05);
+            --bg: #080808;
+            --accent: #b89c6d; 
+            --text-main: #e0e0e0;
+            --text-dim: #555555;
+            --text-sub: #999999;
+            --border: rgba(184, 156, 109, 0.15);
+            --transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background-color: var(--bg-paper);
-            color: var(--charcoal);
-            -webkit-font-smoothing: antialiased;
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Noto Serif SC', serif;
+            height: 100vh; width: 100vw;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; position: relative;
         }
 
-        .serif { font-family: 'Noto Serif SC', serif; }
-        .theme-charcoal { background-color: var(--charcoal); color: var(--bg-paper); }
-
-        .long-strip-container {
-            display: flex;
-            flex-direction: column;
-            gap: 0.35rem; 
-            width: 100%;
-            max-width: 360px; 
+        #app { 
+            width: 88%; max-width: 400px; height: 100%;
+            z-index: 10; display: flex; flex-direction: column; 
         }
 
-        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+        .progress-line {
+            position: fixed; top: 0; left: 0; height: 1px;
+            background: var(--accent); transition: width 0.8s ease; z-index: 1000;
         }
 
-        .metadata {
-            font-size: 8px;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: #A39F9F;
-            font-weight: 600;
+        .screen {
+            display: none; opacity: 0; flex: 1; 
+            transform: translateY(20px); transition: var(--transition);
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
+        }
+        .screen::-webkit-scrollbar { width: 0; display: none; }
+        .screen.active { 
+            display: flex; flex-direction: column; opacity: 1; transform: translateY(0);
         }
 
-        .option-box {
-            transition: all 0.2s ease;
-            background: white;
-            border: 0.5px solid var(--border-fine);
-            font-size: 13px;
-            line-height: 1.4;
-            cursor: pointer;
-            padding: 1rem;
-            margin-bottom: 0.2rem;
-            text-align: left;
-        }
-        .option-box:hover {
-            border-color: var(--teal);
-            background: #F8FAFB;
-        }
+        /* --- 首页 --- */
+        #home { justify-content: center; align-items: center; text-align: center; height: 100%; }
+        .brand { margin-bottom: 5rem; }
+        .brand h1 { font-family: 'Cinzel', serif; font-size: 3.5rem; letter-spacing: 0.3em; color: var(--accent); line-height: 1; text-indent: 0.3em; }
+        .brand p { font-family: 'Inter', sans-serif; font-size: 0.5rem; letter-spacing: 0.8em; color: var(--text-dim); text-transform: uppercase; margin-top: 1.8rem; text-indent: 0.8em; }
+        .hero-text { font-size: 1.1rem; line-height: 3; font-weight: 200; letter-spacing: 0.3em; margin-bottom: 6rem; color: #999; }
+        .btn { background: none; border: 0.5px solid var(--accent); color: var(--accent); padding: 1.2rem; font-family: 'Inter', sans-serif; font-size: 0.55rem; letter-spacing: 0.4em; text-transform: uppercase; cursor: pointer; transition: 0.4s; outline: none; }
+        .btn:active { background: var(--accent); color: #000; transform: scale(0.96); }
 
-        .archive-entry {
-            border-bottom: 0.5px solid rgba(48, 45, 45, 0.03);
-            padding: 0.5rem 0; 
-            transition: all 0.2s ease;
-        }
-        .archive-entry:hover { opacity: 0.5; cursor: help; }
+        /* --- 答题页 --- */
+        #quiz { padding: 12vh 0; }
+        .step-num { font-family: 'Cinzel', serif; color: var(--accent); font-size: 0.55rem; letter-spacing: 0.6em; margin-bottom: 3.5rem; opacity: 0.6; }
+        .question-box h2 { font-size: 1.1rem; line-height: 2.2; font-weight: 300; color: #fdfdfd; margin-bottom: 1.5rem; }
+        .annotation { font-size: 0.7rem; color: #555; line-height: 1.8; font-weight: 200; padding-left: 1rem; border-left: 1px solid var(--border); margin-bottom: 4rem; display: block; }
+        .opt { padding: 1.6rem 0.5rem; font-size: 0.85rem; border-bottom: 0.5px solid rgba(255,255,255,0.05); cursor: pointer; font-weight: 300; color: #aaa; transition: 0.3s; line-height: 1.8; }
+        .opt:active { color: var(--accent); background: rgba(184, 156, 109, 0.03); padding-left: 1rem; }
 
-        .pagination-dot {
-            width: 4px; height: 4px;
-            background: #EAEAEA;
-            border-radius: 50%;
-            transition: all 0.3s;
-        }
-        .pagination-dot.active { background: var(--teal); transform: scale(1.3); }
+        /* --- 结果页复刻版 --- */
+        #result-poster { padding: 4rem 2rem; background: #000; position: relative; }
+        .meta-id { font-family: 'Inter', sans-serif; font-size: 0.4rem; color: var(--text-dim); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 2rem; display: block; }
+        
+        /* 主标题 */
+        .res-primary { margin-bottom: 3.5rem; }
+        .res-name { font-size: 3.8rem; color: var(--accent); font-weight: 700; line-height: 1; letter-spacing: 0.05em; margin-bottom: 0.8rem; }
+        .res-school { font-family: 'Cinzel', serif; font-size: 0.7rem; color: var(--accent); letter-spacing: 0.4em; text-transform: uppercase; opacity: 0.8; }
 
-        #modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(48, 45, 45, 0.98);
-            backdrop-filter: blur(20px);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-        }
+        /* 次要基准 */
+        .res-secondary { margin-bottom: 4rem; border-left: 1px solid var(--border); padding-left: 1.2rem; }
+        .sec-label { font-family: 'Inter', sans-serif; font-size: 0.45rem; color: var(--text-dim); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 0.8rem; display: block; }
+        .sec-name { font-size: 1.4rem; color: #d0d0d0; font-weight: 400; margin-bottom: 0.3rem; }
+        .sec-school { font-family: 'Cinzel', serif; font-size: 0.5rem; color: #666; letter-spacing: 0.25em; text-transform: uppercase; }
 
-        .qr-placeholder {
-            width: 70px; 
-            height: 70px;
-            background: #fff;
-            border: 0.5px solid rgba(48,45,45,0.05);
-            margin: 0.5rem auto;
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            overflow: hidden;
-        }
+        /* 智性三框矩阵 */
+        .dimension-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-bottom: 4.5rem; }
+        .dim-box { border: 0.5px solid var(--border); padding: 1rem 0.5rem; text-align: center; background: rgba(184, 156, 109, 0.01); }
+        .dim-head { font-family: 'Inter', sans-serif; font-size: 0.4rem; color: var(--text-dim); letter-spacing: 0.2em; text-transform: uppercase; display: block; margin-bottom: 0.8rem; }
+        .dim-val { font-size: 0.75rem; color: var(--accent); font-weight: 300; letter-spacing: 0.1em; }
 
-        ::-webkit-scrollbar { width: 0; }
+        /* 肖像解析 */
+        .analysis-section { border-top: 0.5px solid rgba(255,255,255,0.05); padding-top: 3rem; }
+        .section-header { display: flex; align-items: center; margin-bottom: 2rem; }
+        .section-bar { width: 2px; height: 12px; background: var(--accent); margin-right: 0.8rem; }
+        .section-title { font-family: 'Inter', sans-serif; font-size: 0.55rem; color: var(--text-sub); letter-spacing: 0.4em; text-transform: uppercase; }
+        
+        .analysis-text { font-size: 0.88rem; line-height: 2.2; color: #999; font-weight: 200; text-align: justify; letter-spacing: 0.05em; }
+
+        .copyright-tag { margin-top: 5rem; font-family: 'Inter', sans-serif; font-size: 0.4rem; color: var(--text-dim); letter-spacing: 0.3em; text-align: center; }
+
+        .loading-screen { position: fixed; inset: 0; background: #080808; display: flex; justify-content: center; align-items: center; z-index: 2000; color: var(--accent); font-family: 'Cinzel'; letter-spacing: 0.6em; font-size: 0.6rem; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center">
+<body>
 
-    <div id="modal-overlay" onclick="closeModal()">
-        <div class="bg-white p-10 max-w-xs w-full text-center fade-in shadow-2xl" onclick="event.stopPropagation()">
-            <div class="metadata mb-6" style="color:var(--teal)">Archive Detail</div>
-            <h4 id="modal-title" class="text-xl serif font-black mb-6 text-[#302D2D]"></h4>
-            <p id="modal-content" class="text-[12px] leading-relaxed text-gray-400 font-light text-justify"></p>
-            <button onclick="closeModal()" class="mt-12 text-[9px] tracking-widest uppercase border-b border-gray-200 pb-1 text-[#302D2D]">Close / 关闭</button>
-        </div>
+    <div class="progress-line" id="progress"></div>
+    <div class="loading-screen" id="loader">CONCEPTUALIZING...</div>
+
+    <div id="app">
+        <section id="home" class="screen">
+            <div class="brand">
+                <h1>PHILO.</h1>
+                <p>MIND ARCHIVE IDENTIFICATION</p>
+            </div>
+            <div class="hero-text">
+                在碎片的时代，<br>重拾思辨的尊严。
+            </div>
+            <button class="btn" style="width: 180px;" onclick="start()">开启审视</button>
+        </section>
+
+        <section id="quiz" class="screen">
+            <div class="step-num" id="q-idx">Step 01 / 22</div>
+            <div class="question-box" id="q-content"></div>
+            <div class="options-list" id="q-options"></div>
+        </section>
+
+        <section id="result" class="screen">
+            <div id="result-poster">
+                <span class="meta-id">Mind Archive Identification // 2026-01</span>
+                
+                <div class="res-primary">
+                    <h2 class="res-name" id="res-name">---</h2>
+                    <div class="res-school" id="res-school">---</div>
+                </div>
+
+                <div class="res-secondary">
+                    <span class="sec-label">Secondary Archetype</span>
+                    <h3 class="sec-name" id="res-sub-name">---</h3>
+                    <div class="sec-school" id="res-sub-school">---</div>
+                </div>
+
+                <!-- 智性三框矩阵 -->
+                <div class="dimension-grid">
+                    <div class="dim-box">
+                        <span class="dim-head">Cognitive</span>
+                        <p class="dim-val" id="dim-cog">---</p>
+                    </div>
+                    <div class="dim-box">
+                        <span class="dim-head">Ethics</span>
+                        <p class="dim-val" id="dim-eth">---</p>
+                    </div>
+                    <div class="dim-box">
+                        <span class="dim-head">Ontology</span>
+                        <p class="dim-val" id="dim-ont">---</p>
+                    </div>
+                </div>
+
+                <!-- 肖像解析 -->
+                <div class="analysis-section">
+                    <div class="section-header">
+                        <div class="section-bar"></div>
+                        <span class="section-title">Portrait Analysis</span>
+                    </div>
+                    <div class="analysis-text" id="res-analysis">---</div>
+                </div>
+
+                <div class="copyright-tag">@云树CLOUDTREE // PURE THOUGHT PROJECT</div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 3rem 0 10vh;">
+                <button class="btn" onclick="savePoster()">保存档案</button>
+                <button class="btn" onclick="location.reload()">重新审视</button>
+            </div>
+        </section>
     </div>
 
-    <!-- 1. 验证页 -->
-    <section id="access-screen" class="min-h-screen w-full flex flex-col items-center justify-center space-y-16 fade-in theme-charcoal px-12 text-white text-center">
-        <div class="space-y-4">
-            <div class="metadata opacity-40">Entry Control</div>
-            <h2 class="text-3xl serif font-light tracking-widest italic text-white text-nowrap">女哲学家 思想坐标</h2>
-        </div>
-        <div class="space-y-8 w-full max-w-[180px]">
-            <input type="password" id="access-code" class="w-full bg-transparent border-b border-[#4A4646] py-2 text-center text-xl focus:outline-none focus:border-white transition-all font-light tracking-[0.4em]" placeholder="••••">
-            <button onclick="verifyAccess()" class="w-full py-4 bg-white text-[#302D2D] text-[10px] tracking-widest uppercase font-bold active:scale-95">Unlock</button>
-        </div>
-        <p class="text-[9px] tracking-[0.4em] uppercase opacity-30 italic pt-20">© 云树cloudtree</p>
-    </section>
-
-    <!-- 2. 欢迎页 -->
-    <section id="welcome-screen" class="hidden min-h-screen w-full flex flex-col items-center justify-center text-center space-y-32 fade-in theme-charcoal px-10">
-        <header class="space-y-8 text-white">
-            <div class="metadata opacity-30">Archive 2026</div>
-            <h1 class="text-2xl md:text-3xl serif font-normal tracking-tight leading-tight italic">解锁女哲学家<br>精神坐标</h1>
-        </header>
-        <div class="space-y-16 flex flex-col items-center">
-            <p class="text-[11px] leading-relaxed text-[#8C8888] font-light tracking-widest max-w-xs uppercase text-white/60">
-                22 道关于自我的深度探测<br>
-                在 15 位先锋思想家的版图中发现真实
-            </p>
-            <button onclick="startQuiz()" class="px-16 py-6 bg-white text-[#302D2D] text-[10px] tracking-[0.6em] uppercase font-black shadow-2xl active:scale-95">START</button>
-        </div>
-        <p class="text-[8px] tracking-[0.5em] uppercase opacity-20 italic text-white">Designed by 云树cloudtree</p>
-    </section>
-
-    <!-- 3. 测试页 -->
-    <section id="quiz-screen" class="hidden w-full max-w-xl px-12 py-16 flex flex-col min-h-screen fade-in bg-[#FBFCFA]">
-        <div class="space-y-12">
-            <div class="space-y-6">
-                <div class="w-full h-[0.5px] bg-gray-100"><div id="progress" class="h-full bg-[#169cb2] w-0 transition-all duration-700"></div></div>
-                <div class="flex justify-between metadata">
-                    <span id="question-num" style="color:var(--teal)">Phase 01 / 22</span>
-                    <button id="back-btn" onclick="prevQuestion()" class="hidden opacity-40 hover:opacity-100 uppercase tracking-widest text-[8px]">← Prev</button>
-                </div>
-            </div>
-            <h2 id="question-text" class="text-lg md:text-xl serif leading-relaxed font-medium text-[#302D2D]"></h2>
-            <div id="options-container" class="space-y-0.5 pt-4"></div>
-        </div>
-        <p class="text-[8px] text-center mt-auto pt-10 tracking-[0.4em] uppercase opacity-10 italic">Archive Study 云树cloudtree</p>
-    </section>
-
-    <!-- 4. 结果页 -->
-    <section id="result-screen" class="hidden w-full flex flex-col items-center min-h-screen fade-in pb-40 relative">
-        <div class="fixed inset-0 theme-charcoal -z-10"></div>
-        
-        <div class="w-full max-w-[375px] px-4 py-12">
-            <div id="capture-area" class="bg-[#FBFCFA] p-6 md:p-8 shadow-2xl space-y-3 border border-[rgba(0,0,0,0.01)]">
-                
-                <div class="long-strip-container">
-                    
-                    <div class="bg-white p-6 border border-[rgba(48,45,45,0.03)] text-center space-y-1 shadow-sm">
-                        <div class="metadata" style="color:var(--teal)">Report</div>
-                        <h2 class="text-xl serif font-black italic tracking-tighter uppercase" style="color:var(--teal)">女哲学家探测报告</h2>
-                        <div class="w-8 h-[0.5px] bg-[#169cb2] mx-auto opacity-30 mt-1"></div>
-                    </div>
-
-                    <div class="bg-white p-6 border border-[rgba(48,45,45,0.03)] relative shadow-sm text-left">
-                        <div class="metadata mb-4 text-[#A39F9F] font-bold">Primary Archetype</div>
-                        <div class="space-y-4">
-                            <h3 id="mentor-name" class="text-lg serif font-bold tracking-widest uppercase" style="color:var(--teal)"></h3>
-                            <p id="mentor-quote" class="text-[13px] italic text-gray-500 font-light leading-relaxed"></p>
-                            <div class="pt-3 border-t border-gray-50">
-                                <span class="metadata text-[8px]">Major Work / 代表作:</span>
-                                <p id="mentor-work" class="text-[11px] font-bold mt-1 text-[#302D2D] uppercase tracking-widest"></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-8 border border-[rgba(48,45,45,0.03)] flex flex-col items-center shadow-sm">
-                        <div class="metadata mb-6 self-start">Soul Sigil / 思想符文</div>
-                        <div class="w-full aspect-square px-2">
-                            <canvas id="radarChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 border border-[rgba(48,45,45,0.03)] text-left shadow-sm">
-                        <div class="metadata mb-4 text-[#A39F9F]">Interpretation / 深度分析</div>
-                        <p id="result-desc" class="text-[12px] leading-relaxed text-gray-600 font-light text-justify"></p>
-                    </div>
-
-                    <div class="bg-white p-6 border border-[rgba(48,45,45,0.03)] shadow-sm">
-                        <div class="flex justify-between items-center mb-4">
-                            <div class="metadata">更多女哲学家</div>
-                            <button onclick="changeMapPage(1)" class="text-[8px] border border-[#169cb2] text-[#169cb2] px-2 py-0.5 font-bold">REFRESH</button>
-                        </div>
-                        <div id="full-map-archive" class="space-y-0.5 text-left"></div>
-                        <div class="flex justify-center gap-1.5 mt-4" id="pagination-dots"></div>
-                    </div>
-
-                    <div class="p-6 bg-[#F7F7F5] border border-[rgba(48,45,45,0.03)] shadow-inner">
-                        <div class="metadata mb-4">Bibliography / 书单</div>
-                        <div id="book-list" class="space-y-1 text-gray-500 font-light text-[11px] text-left"></div>
-                    </div>
-
-                    <div class="p-6 bg-white border border-[rgba(48,45,45,0.03)] text-center space-y-4 shadow-sm">
-                        <div class="metadata" style="color:var(--teal)">Connect</div>
-                        <div class="qr-placeholder" data-html2canvas-ignore>
-                             <img src="xhs-qr.png" alt="QR Code" class="w-14 h-14 grayscale opacity-40" onerror="this.parentElement.style.display='none'">
-                        </div>
-                        <p class="text-[8px] text-gray-400 tracking-widest uppercase italic">© 云树cloudtree</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 mt-12 px-2">
-                <button onclick="location.reload()" class="py-5 bg-white/5 border border-white/20 text-white text-[10px] tracking-widest uppercase rounded-sm">Retry</button>
-                <button id="save-btn" onclick="saveAsImage()" class="py-5 bg-white text-[#302D2D] text-[10px] tracking-widest uppercase rounded-sm font-black shadow-2xl active:scale-95 transition-all">Save Image</button>
-            </div>
-        </div>
-    </section>
+    <script async src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     <script>
-        const dictionary = {
-            "父权制": "系统性将权力和资源赋予男性的社会结构。",
-            "他者": "女性被定义为男性的附庸，本质由他人裁定。",
-            "平庸之恶": "汉娜·阿伦特术语。指在体制下拒绝思考导致的道德灾难。",
-            "表演性": "性别通过反复言行表演构建出的效应。",
-            "赛博格": "打破自然/文化边界的混杂身份。",
-            "交织性": "压迫并非孤立，而是多种维度叠加。",
-            "注视": "对自己与他者苦难的一种深邃关注。"
-        };
-
-        const philoData = {
-            hypatia: { name: "海帕提娅", quote: "保留你思考的权利。因为即使是错误的思考，也比不思考要好。", work: "《天文学评注》", desc: "你是理性的坚实拥簇。在混乱中仰望永恒的逻辑与秩序。", tags: ["理智", "秩序"], books: ["《海帕提娅传》"], dims: [95, 20, 30, 10, 80, 70], map: "数学、天文学" },
-            wollstonecraft: { name: "玛丽·沃斯通克拉夫特", quote: "我不希望女性拥有支配男性的权力，而是拥有支配她们自身权力的权利。", work: "《为女权辩护》", desc: "启蒙之光。坚信理性没有性别，尊严源于独立。", tags: ["独立", "契约"], books: ["《为女权辩护》"], dims: [70, 80, 50, 60, 80, 95], map: "公民权利" },
-            arendt: { name: "汉娜·阿伦特", quote: "平庸之恶源于拒绝思考，拒绝站在他人的立场去感知世界。", work: "《人的境况》", desc: "公共领域守护者。认为自由在共同担当中显现。", tags: ["行动", "对话"], books: ["《人的境况》", "《平庸之恶》"], dims: [80, 95, 60, 70, 40, 90], map: "政治哲学" },
-            beauvoir: { name: "西蒙娜·德·波伏娃", quote: "女人不是生来就是女人的，而是变成女人的。", work: "《第二性》", desc: "存在主义灵魂。生命是一场永恒的“自我生成”。", tags: ["生成", "主体性"], books: ["《第二性》"], dims: [75, 75, 40, 90, 95, 75], map: "存在主义" },
-            weil: { name: "西蒙娜·薇依", quote: "关注是灵魂中最稀有、最纯粹的慷慨形式。", work: "《扎根》", desc: "近乎神圣的共情力。认为思想植根于对劳动的尊重。", tags: ["注视", "共情"], books: ["《扎根》"], dims: [60, 60, 95, 40, 50, 80], map: "神秘主义" },
-            butler: { name: "朱迪斯·巴特勒", quote: "身份不是固定的事实，而是一种被迫的重复表演。", work: "《性别麻烦》", desc: "规则解构者。在权力的缝隙中寻找反抗的可能。", tags: ["表演", "解构"], books: ["《性别麻烦》"], dims: [70, 60, 50, 95, 85, 60], map: "酷儿理论" },
-            haraway: { name: "唐娜·哈拉维", quote: "我宁愿做一个赛博格，也不愿做一个女神。", work: "《赛博格宣言》", desc: "未来叙事者。打破自然与文化的边界，拥抱技术混杂。", tags: ["赛博格", "后人类"], books: ["《赛博格宣言》"], dims: [70, 65, 40, 95, 70, 60], map: "科学论" },
-            hooks: { name: "贝尔·胡克斯", quote: "爱是走向自由的一种行动。", work: "《关于爱的一切》", desc: "交织性先锋。正义必须包含爱，解放需打破枷锁。", tags: ["交叉性", "爱"], books: ["《关于爱的一切》"], dims: [60, 80, 90, 85, 60, 90], map: "黑人女性主义" },
-            davis: { name: "安吉拉·戴维斯", quote: "自由是一场无止境的奋斗。", work: "《女性，种族与阶级》", desc: "革命者。致力于废除压迫结构。认为解放不可脱离阶级分析。", tags: ["革命", "斗争"], books: ["《女性，种族与阶级》"], dims: [50, 98, 60, 85, 50, 95], map: "马女性主义" },
-            nussbaum: { name: "玛莎·努斯鲍姆", quote: "正义需要一种富有成效的情感。", work: "《能力的创造》", desc: "理智情感主义者。认为情感即认知，衡量福祉。", tags: ["能力", "脆弱"], books: ["《能力的创造》"], dims: [85, 75, 85, 40, 60, 90], map: "能力进路" },
-            stein: { name: "艾德丝·施泰因", quote: "每一个进入灵魂的词，都是一种命运。", work: "《对共情的本质研究》", desc: "现象学朝圣者。在共情深处探寻本质，寻找理性和神性的融合。", tags: ["现象学", "共情"], books: ["《对共情的本质研究》"], dims: [90, 30, 90, 20, 70, 60], map: "现象学" },
-            luxemburg: { name: "罗莎·卢森堡", quote: "自由永远是那些思考方式不同的人的自由。", work: "《社会改良还是革命》", desc: "思想闪电。主张彻底的民主与自发的政治行动。", tags: ["民主", "自发"], books: ["《社会改良还是革命》"], dims: [80, 98, 50, 90, 40, 95], map: "马克思主义" },
-            mernissi: { name: "法蒂玛·梅尔尼西", quote: "如果我们不书写历史，别人就会替我们书写。", work: "《后宫背后的面纱》", desc: "跨文化破墙者。通过重读经典挑战父权与偏见。", tags: ["跨文化", "重写"], books: ["《后宫背后的面纱》"], dims: [80, 70, 60, 85, 75, 85], map: "跨文化" },
-            foot: { name: "菲利帕·福特", quote: "美德是人类繁荣的一种卓越表现。", work: "《美德与罪过》", desc: "美德伦理复兴者。回归人的性格与卓越中。", tags: ["美德", "逻辑"], books: ["《美德与罪过》"], dims: [90, 40, 70, 30, 80, 80], map: "伦理学" },
-            anscombe: { name: "伊丽莎白·安斯康姆", quote: "意图是通向行动本质的钥匙。", work: "《意图》", desc: "逻辑剖析者。挑战伦理学框架，智性的极致。", tags: ["解析", "意图"], books: ["《意图》"], dims: [98, 30, 40, 50, 85, 70], map: "行动论" }
-        };
+        window.addEventListener('load', () => {
+            document.getElementById('loader').style.display = 'none';
+            show('home');
+        });
 
         const questions = [
-            { t: "当你身处社交媒体的信息洪流中，面对一个瞬间引爆全网、但真相未明的事件时，你的第一反应是：", o: [
-                { t: "分析事件背后的逻辑漏洞，寻找证据链的断裂点", p: ["hypatia", "anscombe"] },
-                { t: "关注事件中受苦者的处境，给予一份静谧的共情", p: ["weil", "stein"] },
-                { t: "反思这背后的流量霸权由谁操纵，谁被隐身了", p: ["butler", "haraway"] },
-                { t: "在公共评论区发起对话，试图通过讨论寻求真相", p: ["arendt", "luxemburg"] }
-            ]},
-            { t: "在一个追求极致‘效率’和‘有用性’的社会里，你如何定义自己度过的‘无意义’时光（如发呆、散步）？", o: [
-                { t: "这是一场脱离社会剧本、重塑自我主体性的生存实验", p: ["beauvoir", "butler"] },
-                { t: "这是一种消除自我的注视，让灵魂在沉静中重新扎根", p: ["weil", "stein"] },
-                { t: "这是每个公民应享有的、不被系统剥削的绝对生命权", p: ["wollstonecraft", "nussbaum"] },
-                { t: "这是一次微小的政治反抗，拒绝沦为纯粹的劳动机器", p: ["davis", "luxemburg"] }
-            ]},
-            { t: "看到算法生成的‘虚拟偶像’，你会想：", o: [
-                { t: "这是人类与技术混杂的、后人类的胜利", p: ["haraway", "butler"] },
-                { t: "它缺乏真实存在的厚度，无法与人对话", p: ["arendt", "beauvoir"] },
-                { t: "它是流水线产物，是理性极致僵化的表现", p: ["hypatia", "anscombe"] },
-                { t: "它掩盖了底层劳工或数据的真实剥削", p: ["davis", "hooks"] }
-            ]},
-            { t: "在深夜的孤独中，最能让你感到安宁的是：", o: [
-                { t: "在书籍与思维中构建宇宙秩序", p: ["hypatia", "foot"] },
-                { t: "对万物痛苦的静谧关注", p: ["weil", "stein"] },
-                { t: "策划下一次自我超越或改变的行动", p: ["beauvoir", "luxemburg"] },
-                { t: "想起与志同道合者讨论时的共鸣", p: ["arendt", "hooks"] }
-            ]},
-            { t: "必须在一段感情中做出某种‘牺牲’，你会：", o: [
-                { t: "审视这种牺牲是否基于刻板印象的表演", p: ["butler", "mernissi"] },
-                { t: "认为牺牲必须服务于双方主体性的提升", p: ["beauvoir", "wollstonecraft"] },
-                { t: "这是一种消除自我的注视，具有神圣意义", p: ["weil", "stein"] },
-                { t: "绝不牺牲自由，独立是个体尊严的基石", p: ["hypatia", "anscombe"] }
-            ]},
-            { t: "面对层出不穷的网络热点，你的习惯是：", o: [
-                { t: "保持智性诚实，不被集体情绪裹挟", p: ["arendt", "hypatia"] },
-                { t: "关注其中弱势群体是否受到了叠加压迫", p: ["hooks", "davis"] },
-                { t: "解构热点背后的标签，看谁在操纵定义", p: ["butler", "haraway"] },
-                { t: "在混乱中寻找永恒的美德与意图", p: ["foot", "anscombe"] }
-            ]},
-            { t: "你如何看待‘教育’这件事？", o: [
-                { t: "它是赋予每个人平等竞争权利的契约", p: ["wollstonecraft", "nussbaum"] },
-                { t: "它是打破阶级固化与资本压迫的武器", p: ["davis", "luxemburg"] },
-                { t: "它是为了开启民智，实现理性的飞跃", p: ["hypatia", "foot"] },
-                { t: "它是学会自由‘生成’自我的实验室", p: ["beauvoir", "butler"] }
-            ]},
-            { t: "当你在路边看到无家可归者，瞬间念头是：", o: [
-                { t: "停下脚步，给予毫无占有欲的深度注视", p: ["weil", "stein"] },
-                { t: "反思整个社会分配体系的正义性缺失", p: ["nussbaum", "davis"] },
-                { t: "不仅是捐赠，更应发起改变该阶级的行动", p: ["luxemburg", "hooks"] },
-                { t: "分析其作为‘人’在社会坐标中的尊严受损", p: ["arendt", "wollstonecraft"] }
-            ]},
-            { t: "关于‘传统习俗’，你的本能立场是：", o: [
-                { t: "这是父权制与资本逻辑在现代的延续", p: ["hooks", "mernissi"] },
-                { t: "解构陈腐仪式的合法性，追求流动性", p: ["butler", "haraway"] },
-                { t: "如果有害于主体自由，就必须被推翻", p: ["beauvoir", "wollstonecraft"] },
-                { t: "理性分析其意图，看是否符合繁荣", p: ["anscombe", "foot"] }
-            ]},
-            { t: "如果 AI 能够代替你完成所有工作，你会：", o: [
-                { t: "欢呼解放，终于可以全身心追求理性之光", p: ["hypatia", "foot"] },
-                { t: "警惕技术对公共空间的侵蚀与思考停滞", p: ["arendt", "beauvoir"] },
-                { t: "拥抱赛博格未来，探索新的存在形式", p: ["haraway", "butler"] },
-                { t: "关注失去劳作权的民众是否被彻底抛弃", p: ["weil", "davis"] }
-            ]},
-            { t: "面对性格迥异的人，你理解ta的方式是：", o: [
-                { t: "通过共情深入对方现象界，感知命运", p: ["stein", "weil"] },
-                { t: "分析其行为背后的社会阶级与族裔背景", p: ["hooks", "davis"] },
-                { t: "意识到每个人都是一场正在生成的表演", p: ["butler", "beauvoir"] },
-                { t: "用逻辑推导其动机，寻找知性共鸣点", p: ["hypatia", "anscombe"] }
-            ]},
-            { t: "你认为‘自由’最真实的体验在于：", o: [
-                { t: "在与他人共同改变世界的行动瞬间", p: ["arendt", "luxemburg"] },
-                { t: "彻底摆脱各种社会身份与标签的时刻", p: ["butler", "haraway"] },
-                { t: "通过思考触及宇宙不变真理的那个点", p: ["hypatia", "foot"] },
-                { t: "完全不被外界定义，持续自我生成的动态", p: ["beauvoir", "wollstonecraft"] }
-            ]},
-            { t: "遭受不公委屈时，最有效的自我疗愈是：", o: [
-                { t: "将痛苦转化为分析权力结构的智性力量", p: ["butler", "hooks"] },
-                { t: "提醒自己遭遇只是生成自我的磨刀石", p: ["beauvoir", "anscombe"] },
-                { t: "进入寂静，在更高维度的秩序中释怀", p: ["weil", "stein"] },
-                { t: "与同道者交流，将遭遇转化为公共议题", p: ["arendt", "davis"] }
-            ]},
-            { t: "如果你有一笔巨款，最想投入的领域是：", o: [
-                { t: "建立一个跨越偏见的教育平权体系", p: ["wollstonecraft", "nussbaum"] },
-                { t: "资助激进研究，打破身份与技术壁垒", p: ["haraway", "butler"] },
-                { t: "直接改善底层劳工的扎根环境与尊严", p: ["weil", "luxemburg"] },
-                { t: "扩建公共广场与图书馆，复兴对话", p: ["arendt", "hypatia"] }
-            ]},
-            { t: "你对‘成功’的最终定义是：", o: [
-                { t: "保持极高的智性严谨与诚实", p: ["anscombe", "hypatia"] },
-                { t: "从未向体制妥协，参与了伟大变革", p: ["luxemburg", "davis"] },
-                { t: "通过思想修补了世界的某种裂痕", p: ["weil", "hooks"] },
-                { t: "始终是自己的主宰，完成自我超越", p: ["beauvoir", "wollstonecraft"] }
-            ]},
-            { t: "面对社交媒体‘人设’，你的态度是：", o: [
-                { t: "看穿表演本质，意识到身份虚幻性", p: ["butler", "mernissi"] },
-                { t: "觉得这是一种逃避真实存在的软弱表现", p: ["beauvoir", "arendt"] },
-                { t: "分析算法人设对个体能力发展的限制", p: ["nussbaum", "haraway"] },
-                { t: "认为这些标签掩盖了真实的阶级处境", p: ["hooks", "davis"] }
-            ]},
-            { t: "如果你能拥有一个‘特异功能’，你希望是：", o: [
-                { t: "瞬间理解宇宙所有底层逻辑的能力", p: ["hypatia", "anscombe"] },
-                { t: "能够瞬间感知全球所有受苦者处境的能力", p: ["weil", "stein"] },
-                { t: "瞬间消除所有人心中刻板偏见的能力", p: ["wollstonecraft", "hooks"] },
-                { t: "能够瞬间集结千万人发起正义革命的能力", p: ["luxemburg", "davis"] }
-            ]},
-            { t: "评价一个人的道德时，你最看重：", o: [
-                { t: "ta在极端情况下表现出的卓越美德", p: ["foot", "stein"] },
-                { t: "ta的行为是否具有清晰且诚实的意图", p: ["anscombe", "hypatia"] },
-                { t: "ta是否敢于挑战压迫性的权力结构", p: ["davis", "butler"] },
-                { t: "ta在日常生活中对他人的关怀深度", p: ["hooks", "weil"] }
-            ]},
-            { t: "关于‘金钱与物质’，你的哲学立场是：", o: [
-                { t: "它是人格保障，但不应凌驾于理性之上", p: ["wollstonecraft", "foot"] },
-                { t: "它是统治工具，必须被彻底重新分配", p: ["luxemburg", "davis"] },
-                { t: "它往往成为‘注视’的遮蔽，追求极简", p: ["weil", "stein"] },
-                { t: "它是主体生成的资源，而非存在的目的", p: ["beauvoir", "nussbaum"] }
-            ]},
-            { t: "你希望墓志铭上写着什么？", o: [
-                { t: "“在这里，有一颗永不向偏见屈服的灵魂。”", p: ["wollstonecraft", "hypatia"] },
-                { t: "“ta在这里通过行动，让世界稍微改变。”", p: ["arendt", "luxemburg"] },
-                { t: "“ta始终注视着那些被世界遗忘的角落。”", p: ["weil", "hooks"] },
-                { t: "“ta不仅是一个人，是一场流动的奇迹。”", p: ["beauvoir", "haraway"] }
-            ]},
-            { t: "当你在公共空间看到一个极具争议的‘新词’或‘标签’时，你的本能反应是：", o: [
-                { t: "分析词语定义的演变过程与背后的权力博弈", p: ["butler", "haraway"] },
-                { t: "思考该词语是否真实、精准地反映了生存本质", p: ["stein", "foot"] },
-                { t: "担心这种粗暴的标签会简化复杂的个人命运", p: ["arendt", "hooks"] },
-                { t: "运用逻辑拆解其语法意图，审视其是否严谨", p: ["anscombe", "hypatia"] }
-            ]},
-            { t: "在一次漫长的等待（如排队或交通拥堵）中，你感到时间正在被‘空耗’，你会：", o: [
-                { t: "把它变成一场与自我意识、与万物的静默对谈", p: ["weil", "stein"] },
-                { t: "在脑海中策划下一次具有真实公共影响的行动", p: ["arendt", "luxemburg"] },
-                { t: "利用这段真空期，对某逻辑悖论进行深度推演", p: ["hypatia", "foot"] },
-                { t: "接纳这种‘生成’中的空无，视其为生命的原貌", p: ["beauvoir", "haraway"] }
-            ]}
+            { q: "‘玛丽的房间’实验：一位色盲科学家掌握了光的所有物理数据，当她第一次看到红色：", options: [{ t: "她学到了新知识，物理规律无法穷尽主观体验（Qualia）。", s: { murdoch: 4, hume: 3 } }, { t: "她没学到新知识，大脑的电化学反应已在她的逻辑推演中。", s: { descartes: 5 } }, { t: "这说明世界本身即是感知的集合。", s: { hume: 5 } }] },
+            { q: "传送机在月球摧毁并重建一个完美的你，你认为进入舱体意味着：", options: [{ t: "死亡。意识的物理连续性一旦断裂，自我便已消亡。", s: { descartes: 5 } }, { t: "存续。既然记忆和人格知觉一致，‘我’的本质未变。", s: { hume: 5 } }, { t: "存续。身体只是工具，那个‘我’能继续行动才重要。", s: { arendt: 5 } }] },
+            { q: "罗尔斯的‘无知之幕’：如果让你在出生前制定社会规则，但不知道自己会是谁：", options: [{ t: "我会制定最能保障弱势群体的法则（公平即正义）。", s: { arendt: 4, murdoch: 3 } }, { t: "我会追求最大化的整体效用。", s: { mill: 5 } }, { t: "我会坚持逻辑上的契约严密性。", s: { kant: 4 } }] },
+            { q: "‘维特根斯坦的甲虫’：每个人盒子里都有个叫甲虫的东西，别人看不见。你认为语言能描述真相吗？", options: [{ t: "语言只是映射。它试图对应那个外部存在的客观理式。", s: { plato: 5, descartes: 2 } }, { t: "语言是种博弈。真相是在公共言说与行动中‘涌现’的。", s: { arendt: 5 } }, { t: "语言是种幻觉。它只是为了生活便利而不得不信的习惯。", s: { hume: 5 } }] },
+            { q: "当你在没人注视的深山看到一棵倒下的树：", options: [{ t: "即使没人听见，它倒下的声音作为物理规律客观存在。", s: { descartes: 4, plato: 3 } }, { t: "如果没有感知主体，讨论‘倒下’这一概念并无本质意义。", s: { hume: 5 } }, { t: "它的实存是‘物自体’，超出了人类的知觉范畴。", s: { kant: 5 } }] },
+            { q: "失控的电车前，如果你不作为会死5人，拉动闸门会死1人（此人是你挚爱）：", options: [{ t: "拉闸。个体必须为最大化整体幸福而承受牺牲。", s: { mill: 5 } }, { t: "不拉。我拒绝将人仅仅作为达成某种结果的工具。", s: { kant: 5 } }, { t: "这种道德困境的本质在于对我者命运的‘凝视’。", s: { murdoch: 5 } }] },
+            { q: "关于‘美’，你更认可哪种直觉？", options: [{ t: "美是万物背后永恒和谐的数学/理式比例。", s: { plato: 5 } }, { t: "美是我放下自我的贪婪，纯粹关注他者的无私瞬间。", s: { murdoch: 5 } }, { t: "美是生命意志在荒芜中创造出的英雄式幻象。", s: { nietzsche: 5 } }] },
+            { q: "如果你拥有‘盖吉氏戒指’：", ann: "柏拉图的思想实验：一枚能让你完全隐形且行事绝不被惩罚、被发现的戒指。", options: [{ t: "依然恪守道德。道德源于自律，而非外界的监督。", s: { kant: 5 } }, { t: "释放本能。既然契约失效，我将追求绝对自由。", s: { nietzsche: 5 } }, { t: "这让我审视权力如何通过‘监控’维持人的秩序感。", s: { arendt: 3, beauvoir: 2 } }] },
+            { q: "帕斯卡的赌注：关于终极信仰，如果无法证明真伪，你会：", options: [{ t: "选择相信。如果赢了获得无限，输了也无损失，这是理性的。", s: { descartes: 4, mill: 2 } }, { t: "拒绝盲信。诚实的怀疑远比功利的相信更有尊严。", s: { hume: 5 } }, { t: "亲手赋予生命某种神圣的意志，哪怕它是虚构的。", s: { nietzsche: 5 } }] },
+            { q: "AI写出了一首让全人类落泪的诗，你会认为：", options: [{ t: "它是美的。只要符合美的理式，来源并不重要。", s: { plato: 5 } }, { t: "它是虚假的。因为它缺乏主体的生存体验和选择。", s: { beauvoir: 5 } }, { t: "它没有‘灵魂’。因为它不具备原发的‘行动’能力。", s: { arendt: 5 } }] },
+            { q: "尼采的‘永恒轮回’：如果你的一生要不断地重复，你会：", options: [{ t: "恐慌。这种无尽的循环是虚无主义的噩梦。", s: { hume: 3 } }, { t: "接纳。以此确立我每一刻选择的绝对分量。", s: { nietzsche: 5 } }, { t: "寻找那个在任何轮回中都恒定不变的真理。", s: { plato: 5 } }] },
+            { q: "你最认可的人生态度是：", options: [{ t: "在绝对怀疑中寻找唯一的确定支点。", s: { descartes: 5 } }, { t: "顺应自然的秩序，区分什么是‘可控的’。", s: { aurelius: 5 } }, { t: "在荒谬的世界中，通过不断超越旧我来创造新自我。", s: { nietzsche: 5, beauvoir: 3 } }] },
+            { q: "‘忒修斯之船’：如果一艘船的木板被全部更换，它还是原来那艘吗？", options: [{ t: "是。它承载的‘灵魂’或设计蓝图未变。", s: { plato: 5 } }, { t: "不是。物理实体的连续性已被新物质取代。", s: { hume: 4 } }, { t: "它是一个不断生成的‘动态过程’，身份是人为赋予的标签。", s: { beauvoir: 5 } }] },
+            { q: "面对不公正的压迫，你应该：", options: [{ t: "通过反抗，在具体的生存处境中确认我的自由。", s: { beauvoir: 5 } }, { t: "走入公共领域，与志同道合者共同改变世界。", s: { arendt: 5 } }, { t: "保持内心的主权，使外界的暴力无法伤害我的宁静。", s: { aurelius: 5 } }] },
+            { q: "你认为‘真理’的本质是：", options: [{ t: "逻辑大厦。即使没有人类存在，它依然冷峻地实存。", s: { descartes: 5 } }, { t: "公共契约。它是多元主体通过对话达成的临时共识。", s: { arendt: 5 } }, { t: "感知归纳。它只是我们目前还没被推翻的观察习惯。", s: { hume: 5 } }] },
+            { q: "关于‘爱’，哪种观点最让你心颤？", options: [{ t: "爱是对另一个独立灵魂极度清晰、无私的‘关注’。", s: { murdoch: 5 } }, { t: "爱是两个自由的主体在开放性关系中的共同冒险。", s: { beauvoir: 5 } }, { t: "爱是灵魂对理式世界中完美原型的重逢记忆。", s: { plato: 5 } }] },
+            { q: "文明发展的最高成就应该是：", options: [{ t: "彻底掌握宇宙规律，消除一切非理性因素。", s: { descartes: 5 } }, { t: "让每个人都能在没有任何预定义的前提下自我生成。", s: { beauvoir: 5 } }, { t: "保护一个能让每个人通过言行展示‘卓越’的公共领域。", s: { arendt: 5 } }] },
+            { q: "当大众嘲笑你的理想时，你的第一反应：", options: [{ t: "外界的评价超出了我的控制，与我无关。", s: { aurelius: 5 } }, { t: "这正是我对抗平庸、确认自我意志的时刻。", s: { nietzsche: 5 } }, { t: "反思这一评价在逻辑上是否具备一致性。", s: { descartes: 5 } }] },
+            { q: "西西弗斯推石上山是徒劳的，但他是幸福的。这意味着：", options: [{ t: "幸福在于对无意义过程的主动肯定。", s: { nietzsche: 5 } }, { t: "幸福在于看透了虚无，进而获得绝对的冷静。", s: { aurelius: 4 } }, { t: "幸福在于每一次微小的感官知觉都是真实的获得。", s: { hume: 3 } }] },
+            { q: "你如何定义‘一个成功的生命’？", options: [{ t: "最大程度减轻了人类总体的痛苦（减熵）。", s: { mill: 5 } }, { t: "在死亡面前能满怀激情地再次肯定自己的一生。", s: { nietzsche: 5 } }, { t: "完成了‘灵魂转向’，从影子世界回到了太阳底下。", s: { plato: 5 } }] },
+            { q: "生活如果失去了目标，你：", options: [{ t: "依靠日常的习惯和本能平稳度日，不问终点。", s: { hume: 5 } }, { t: "亲手凿出一份意义，并为此负责。", s: { nietzsche: 5, beauvoir: 3 } }, { t: "在对他人的责任与纯粹的‘关注’中重新扎根。", s: { murdoch: 5 } }] },
+            { q: "终极实验：如果宇宙明天毁灭且一切痕迹消失，你行善的唯一动力是：", options: [{ t: "因为行善本身就是绝对正确的理性法则。", s: { kant: 5 } }, { t: "这是我作为一个自由主体，在最后时刻对自己命运的肯定。", s: { beauvoir: 5 } }, { t: "仅仅是为了在虚无降临前，给予那个人最后一份纯粹的关注。", s: { murdoch: 5 } }] }
         ];
 
-        let curIdx = 0, scoreMap = {}, historyArr = [];
-        Object.keys(philoData).forEach(k => scoreMap[k] = 0);
+        const icons = {
+            nietzsche: { name: "尼采", school: "Existentialism", cog: "意志权力", eth: "价值重估", ont: "永恒轮回", analysis: "你是一个激进的创造者，洞察着平庸叙事背后的虚无本质。你拒绝被宏大叙事绑架，在历史的断裂处重构身份的多重可能。你深知真理往往只是权力意志的微观运作，因此你选择以舞者的姿态跨越深渊。你的一生不是为了寻找意义，而是为了亲手凿刻出足以对抗荒谬的永恒坐标。" },
+            aurelius: { name: "奥勒留", school: "Stoicism", cog: "理性统治", eth: "斯多葛主义", ont: "自然秩序", analysis: "你是一个内敛的守望者，在喧嚣的帝国边境筑起精神的堡垒。你具备一种罕见的辩证眼光：既深情地拥抱当下，又冷峻地剥离那些不可控的偶然。对你而言，自由并非随心所欲，而是对自然律的深度顺应。在万物流转的废墟之上，你守护着那份唯有理性才能赋予的、不陷的宁静。" },
+            kant: { name: "康德", school: "Deontology", cog: "先验范畴", eth: "定言令回", ont: "物自体", analysis: "你是一个灵魂的立法者，在认知的疆界中划定神圣的防线。你拒绝感官的廉价诱导，转而向内求索那条冷峻而绝对的道德律令。你将人视为终极目的，在逻辑的严密性中确立了主体的尊严。你深知理性的局限，却依然在不可知的物自体边缘，为人类精神构建了永恒的星空坐标。" },
+            descartes: { name: "笛卡尔", school: "Rationalism", cog: "普遍怀疑", eth: "临时道德", ont: "身心二元", analysis: "你是一个孤独的坐标原点。你以怀疑为刃，切断了一切未经审视的教条，直到碰触到那个唯一的、不可撼动的『我思』。你崇尚明晰与确定，在几何式的严谨中重构了精神与世界的联系。你的一生是一场向着光明的逻辑远征，在本体论的荒野中，你是那个第一个确立自我的测绘者。" },
+            plato: { name: "柏拉图", school: "Idealism", cog: "洞穴回忆", eth: "灵魂转向", ont: "绝对理式", analysis: "你是一个永恒的追光者，在影子的世界里识别理式的轮廓。你深感感官世界的虚妄，终其一生都在试图完成一场壮丽的灵魂转向。你相信美与善是宇宙最深处的比例，在超越表象的攀升中，你试图找回灵魂失落的记忆。对你而言，真理不在彼岸，而在你每一次穿透表象的凝视之中。" },
+            hume: { name: "休谟", school: "Empiricism", cog: "习惯联想", eth: "情感主义", ont: "经验怀疑", analysis: "你是一个优雅的解构者，以温润的常识消解了形而上学的傲慢。你只承认感官触碰到的真实，承认因果仅仅是习惯的联想。你拒绝了虚幻的绝对性，转而在流变的经验之海中，为人类找到了最可靠的生存习惯。在你的世界里，怀疑不是痛苦的折磨，而是一种走向人性真实与谦卑的必要洗礼。" },
+            arendt: { name: "阿伦特", school: "Political Philosophy", cog: "行动涌现", eth: "公共责任", ont: "政治自由", analysis: "你是一个敏锐的公共实践者，在言说与行动中确认人的第二次出生。你拒绝平庸的恶，警惕一切试图抹杀多元性的极权诱惑。你深信人的尊严唯有在与他者的共建中才能获得。你在公共领域的博弈中寻找自由的真谛，在每一个开启新事物的瞬间，你重申了作为人的、不可替代的卓越。" },
+            beauvoir: { name: "波伏娃", school: "Existentialism", cog: "存在生成", eth: "自由辩证", ont: "处境超越", analysis: "你是一个清醒的生成者。你拒绝被任何预定义的本质所囚禁，坚信每一个‘我’都是在具体的处境中亲手创造的。你在开放的关系中实践自由的博弈，追求一种不断向未来投射的生存。对你而言，性别与身份不是宿命，而是通往无限可能性的出发点，你以生命的热度对抗了存在的荒谬。" },
+            murdoch: { name: "默多克", school: "Moral Realism", cog: "专注洞察", eth: "无私关注", ont: "道德实在", analysis: "你是一个深情的注视者。你认为道德的本质不在于意志的决断，而在于对他者极其清晰、无私的关注。你努力剥离自我的幻象，去看见那个原本真实的、痛苦或美好的他者。美对你而言是道德的预演，在对完美的凝视中，你学会了放下贪婪，让灵魂在纯粹的‘关注’中获得洗礼与重生。" }
+        };
 
-        let currentMapPage = 0;
-        const mapPageSize = 5;
+        let current = 0, score = {};
 
-        function verifyAccess() {
-            const input = document.getElementById('access-code').value.trim().toLowerCase();
-            if (input === 'tree') {
-                document.getElementById('access-screen').classList.add('hidden');
-                document.getElementById('welcome-screen').classList.remove('hidden');
-            } else {
-                const msg = document.getElementById('err-msg');
-                if(msg){ msg.style.opacity = 1; setTimeout(() => msg.style.opacity = 0, 2000); }
-            }
-        }
-
-        function showDefinition(word) {
-            document.getElementById('modal-title').innerText = word;
-            const data = Object.values(philoData).find(p => p.name === word);
-            document.getElementById('modal-content').innerText = dictionary[word] || data?.desc || "正在检索数据...";
-            document.getElementById('modal-overlay').style.display = 'flex';
-        }
-        function closeModal() { document.getElementById('modal-overlay').style.display = 'none'; }
-
-        function startQuiz() {
-            document.getElementById('welcome-screen').classList.add('hidden');
-            document.getElementById('quiz-screen').classList.remove('hidden');
-            showQ();
-        }
-
-        function showQ() {
-            const q = questions[curIdx];
-            document.getElementById('question-num').innerText = `Phase ${String(curIdx + 1).padStart(2, '0')} / 22`;
-            let text = q.t;
-            Object.keys(dictionary).forEach(word => {
-                const regex = new RegExp(word, 'g');
-                text = text.replace(regex, `<span class="term-tag" style="cursor:help; color:var(--teal); border-bottom: 0.5px dotted #169cb2;" onclick="showDefinition('${word}')">${word}</span>`);
-            });
-            document.getElementById('question-text').innerHTML = text;
-            document.getElementById('progress').style.width = `${((curIdx) / 22) * 100}%`;
-            document.getElementById('back-btn').style.display = curIdx > 0 ? 'inline-block' : 'none';
-
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-            q.o.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = "w-full p-4 text-left option-box text-[#302D2D] shadow-sm";
-                btn.innerText = opt.t;
-                btn.onclick = () => {
-                    historyArr.push(opt.p);
-                    opt.p.forEach(k => scoreMap[k]++);
-                    if (curIdx < 21) { curIdx++; showQ(); } else { showResult(); }
+        function start() { show('quiz'); loadQ(); }
+        
+        function loadQ() {
+            const data = questions[current];
+            document.getElementById('q-idx').innerText = `Step ${String(current + 1).padStart(2, '0')} / 22`;
+            document.getElementById('q-content').innerHTML = `<h2>${data.q}</h2>` + (data.ann ? `<span class="annotation">${data.ann}</span>` : "");
+            
+            const cont = document.getElementById('q-options');
+            cont.innerHTML = '';
+            data.options.forEach(o => {
+                const div = document.createElement('div');
+                div.className = 'opt';
+                div.innerText = o.t;
+                div.onclick = () => {
+                    setTimeout(() => select(o.s), 100);
                 };
-                container.appendChild(btn);
+                cont.appendChild(div);
             });
+            document.getElementById('progress').style.width = ((current / questions.length) * 100) + '%';
         }
 
-        function prevQuestion() {
-            if (curIdx > 0) {
-                const lastKeys = historyArr.pop();
-                lastKeys.forEach(k => scoreMap[k]--);
-                curIdx--; showQ();
-            }
-        }
-
-        function renderMapPage(pageIndex) {
-            const container = document.getElementById('full-map-archive');
-            const keys = Object.keys(philoData);
-            const start = pageIndex * mapPageSize;
-            const groupKeys = keys.slice(start, start + mapPageSize);
-
-            container.innerHTML = groupKeys.map(k => `
-                <div class="archive-entry" onclick="showDefinition('${philoData[k].name}')">
-                    <div class="flex justify-between items-end">
-                        <span class="text-[13px] font-bold text-[#302D2D] tracking-tighter">${philoData[k].name}</span>
-                        <span class="text-[8px] uppercase tracking-[0.1em] text-[#A39F9F] mb-[1px]">${philoData[k].map}</span>
-                    </div>
-                </div>
-            `).join('');
-
-            const dots = document.getElementById('pagination-dots');
-            dots.innerHTML = [0,1,2].map(i => `<div class="pagination-dot ${i === pageIndex ? 'active' : ''}"></div>`).join('');
-        }
-
-        function changeMapPage(offset) {
-            currentMapPage = (currentMapPage + offset + 3) % 3;
-            renderMapPage(currentMapPage);
+        function select(s) {
+            for(let key in s) score[key] = (score[key] || 0) + s[key];
+            current++;
+            if(current < questions.length) {
+                const q = document.getElementById('quiz');
+                q.style.opacity = 0;
+                q.style.transform = 'translateY(-20px)'; 
+                setTimeout(() => { 
+                    loadQ(); 
+                    q.style.opacity = 1; 
+                    q.style.transform = 'translateY(0)';
+                }, 300);
+            } else { showResult(); }
         }
 
         function showResult() {
-            document.getElementById('quiz-screen').classList.add('hidden');
-            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('progress').style.width = '100%';
+            const sorted = Object.keys(score).sort((a, b) => score[b] - score[a]);
+            const primary = icons[sorted[0]] || icons.nietzsche;
+            const secondary = icons[sorted[1]] || icons.aurelius;
 
-            const sorted = Object.keys(scoreMap).sort((a,b) => scoreMap[b] - scoreMap[a]);
-            const winnerKey = sorted[0];
-            const data = philoData[winnerKey];
+            document.getElementById('res-name').innerText = primary.name;
+            document.getElementById('res-school').innerText = primary.school;
+            document.getElementById('dim-cog').innerText = primary.cog;
+            document.getElementById('dim-eth').innerText = primary.eth;
+            document.getElementById('dim-ont').innerText = primary.ont;
+            document.getElementById('res-analysis').innerText = primary.analysis;
 
-            document.getElementById('mentor-name').innerText = data.name;
-            document.getElementById('mentor-quote').innerText = `“${data.quote}”`;
-            document.getElementById('mentor-work').innerText = data.work;
-            document.getElementById('result-desc').innerText = data.desc;
-            document.getElementById('book-list').innerHTML = data.books.map(b => `<div class="py-1 italic text-[11px] text-gray-500">· ${b}</div>`).join('');
+            document.getElementById('res-sub-name').innerText = secondary.name;
+            document.getElementById('res-sub-school').innerText = secondary.school;
             
-            renderMapPage(0);
-
-            new Chart(document.getElementById('radarChart').getContext('2d'), {
-                type: 'radar',
-                data: {
-                    labels: ['理智', '行动', '慈悲', '颠覆', '主体', '正义'],
-                    datasets: [{
-                        data: data.dims,
-                        backgroundColor: 'rgba(22, 156, 178, 0.22)',
-                        borderColor: '#169cb2',
-                        borderWidth: 1.5,
-                        pointBackgroundColor: '#169cb2',
-                        pointRadius: 2
-                    }]
-                },
-                options: {
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        r: { 
-                            min: 0, max: 100,
-                            ticks: { display: false }, 
-                            grid: { color: 'rgba(48, 45, 45, 0.05)' }, 
-                            angleLines: { color: 'rgba(48, 45, 45, 0.05)' },
-                            pointLabels: { font: { size: 10, family: 'Noto Serif SC', weight: '500' }, color: '#302D2D' } 
-                        } 
-                    }
-                }
-            });
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            show('result');
         }
 
-        async function saveAsImage() {
-            const btn = document.getElementById('save-btn');
-            btn.innerText = "Processing...";
-            const canvas = await html2canvas(document.getElementById('capture-area'), { scale: 3, backgroundColor: "#FBFCFA" });
-            const link = document.createElement('a');
-            link.download = `Detection_Report.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-            btn.innerText = "Save Image";
+        function show(id) {
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(s => {
+                s.classList.remove('active');
+                s.style.display = 'none';
+            });
+            const target = document.getElementById(id);
+            target.style.display = 'flex';
+            setTimeout(() => target.classList.add('active'), 50);
+            window.scrollTo(0,0);
+        }
+
+        function savePoster() {
+            if (typeof html2canvas === 'undefined') return;
+            const loader = document.getElementById('loader');
+            loader.innerText = "GENERATING ARCHIVE...";
+            loader.style.display = 'flex';
+            html2canvas(document.getElementById('result-poster'), { backgroundColor: '#000', scale: 3, useCORS: true }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `PHILO_ARCHIVE.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                loader.style.display = 'none';
+            });
         }
     </script>
 </body>
