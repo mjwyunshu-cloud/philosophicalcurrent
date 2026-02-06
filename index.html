@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PHILO | 精神原型测试 2.1.6</title>
+    <title>PHILO | 精神原型测试 2.1.8</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+SC:wght@200;300;400;500;700;900&family=Inter:wght@100;200;300;400;500;600;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- 使用更稳定的 Chart.js 版本 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <style>
         :root {
             --bg: #fff37e;        /* 主色：柠檬黄 */
             --secondary: #cfceff; /* 辅色：柔紫蓝 */
-            --danger: #f7514f;    /* 核心操作：珊瑚红 */
+            --danger: #f7514f;    /* 核心：珊瑚红 */
             --success: #4fbf5a;   /* 确认：活力绿 */
-            --ref-bg: #f2faf3;    /* 思想参考背景：极简浅绿 */
-            --text-main: #28352c; /* 深林墨绿 */
+            --ref-bg: #f2faf3;    /* 解读背景：舒适浅绿 */
+            --text-main: #28352c; /* 深墨绿 */
             --text-dim: #9aa59e;
             --card-bg: #ffffff;
             --grad-soft: linear-gradient(135deg, rgba(247, 81, 79, 0.12) 0%, rgba(207, 206, 255, 0.12) 100%);
@@ -42,7 +43,7 @@
 
         .screen {
             display: none; opacity: 0; flex: 1; 
-            transform: translateY(15px); transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(15px); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             padding: 20px 0;
         }
         .screen.active { display: flex; flex-direction: column; opacity: 1; transform: translateY(0); }
@@ -86,7 +87,7 @@
         .opt.selected { border: 1.5px solid var(--success); box-shadow: 0 5px 15px rgba(0,0,0,0.02); background: #fdfdfd; }
         .opt.dimmed { opacity: 0.6; transform: scale(0.98); }
         
-        /* 思想参考容器：去除标题行，保持文字解读 */
+        /* 思想参考容器：纯文字展示，无标题行，浅绿底 */
         .opt-ref-box {
             max-height: 0;
             overflow: hidden;
@@ -112,7 +113,7 @@
         .btn-next { background: var(--text-main); color: white; border: none; padding: 1rem 2.8rem; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; font-weight: 800; cursor: pointer; border-radius: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
 
         /* --- 结果页 --- */
-        #result-poster { padding: 4rem 2rem; background: var(--card-bg); position: relative; border-radius: 4px; overflow: hidden; border: none; }
+        #result-poster { padding: 4rem 2rem; background: var(--card-bg); position: relative; border-radius: 4px; overflow: hidden; border: none; width: 100%; }
         .meta-tag { font-family: 'Inter'; font-size: 0.42rem; color: var(--text-dim); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 3rem; display: block; text-align: center; font-weight: 400; }
         .tutor-section { background: var(--grad-soft); padding: 3.5rem 1.8rem; margin-bottom: 3rem; text-align: center; border-radius: 2px; }
         .tutor-name { font-size: 3rem; color: var(--text-main); font-weight: 900; line-height: 1; margin-bottom: 0.8rem; padding: 10px 25px; display: inline-block; background: rgba(255,255,255,0.6); }
@@ -122,10 +123,13 @@
         .dim-box { background: rgba(0,0,0,0.02); padding: 1.2rem 0.4rem; text-align: center; border-radius: 1px; }
         .dim-head { font-family: 'Inter'; font-size: 0.35rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; display: block; font-weight: 400; }
         .dim-val { font-size: 0.85rem; color: var(--danger); font-weight: 800; }
-        .data-section { margin-bottom: 3.5rem; }
+        .data-section { margin-bottom: 3.5rem; width: 100%; }
         .sec-header { display: flex; align-items: center; margin-bottom: 1.5rem; }
         .sec-title { font-family: 'Inter'; font-size: 0.75rem; color: var(--text-main); letter-spacing: 0.2em; text-transform: uppercase; font-weight: 800; }
-        #radar-container { width: 100%; height: 320px; margin-bottom: 1rem; }
+        
+        #radar-container { width: 100%; height: 320px; margin: 1.5rem 0; position: relative; }
+        canvas#radarChart { width: 100% !important; height: 100% !important; }
+
         .analysis-section { background: linear-gradient(to bottom, transparent, rgba(207, 206, 255, 0.08)); padding: 2rem 0; margin-bottom: 3.5rem; }
         .analysis-text { font-size: 0.98rem; line-height: 2.6; color: var(--text-main); font-weight: 300; text-align: justify; letter-spacing: 0.03em; }
         .keyword { color: var(--danger); border-bottom: 2px solid rgba(247, 81, 79, 0.25); cursor: help; font-weight: 500; }
@@ -133,7 +137,6 @@
         .book-box h4 { font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.6rem; font-family: 'Cinzel'; font-weight: 800; }
         .book-box p { font-size: 0.85rem; color: var(--text-main); line-height: 1.8; opacity: 0.7; font-weight: 300; }
 
-        /* 网页端可见二维码区域 */
         .qr-web-only { margin-top: 3rem; display: flex; flex-direction: column; align-items: center; padding: 4rem 0; border-top: 1px solid rgba(0,0,0,0.05); }
         .qr-web-only .qr-box { width: 120px; height: 120px; background: #fff; padding: 8px; margin-bottom: 1.5rem; box-shadow: 0 15px 45px rgba(0,0,0,0.04); }
         .qr-web-only .qr-box img { width: 100%; height: 100%; object-fit: cover; }
@@ -142,8 +145,9 @@
         .copyright-tag { margin-top: 4rem; font-family: 'Inter'; font-size: 0.45rem; color: var(--text-main); text-align: center; padding-bottom: 50px; text-transform: uppercase; letter-spacing: 0.4em; font-weight: 800; opacity: 0.4; }
         .loading-screen { position: fixed; inset: 0; background: var(--bg); display: flex; justify-content: center; align-items: center; z-index: 2000; color: var(--text-main); font-family: 'Cinzel'; letter-spacing: 0.8em; font-size: 0.9rem; font-weight: 900; }
 
+        /* 弹窗：移除叉叉 */
         #modal { position: fixed; inset: 0; background: rgba(40, 53, 44, 0.95); z-index: 3000; display: none; justify-content: center; align-items: center; padding: 2.5rem; backdrop-filter: blur(12px); }
-        .modal-body { max-width: 380px; padding: 3rem; background: var(--bg); position: relative; border-radius: 4px; box-shadow: 20px 20px 0px var(--danger); }
+        .modal-body { max-width: 380px; padding: 3.5rem 3rem; background: var(--bg); position: relative; border-radius: 4px; box-shadow: 20px 20px 0px var(--danger); }
     </style>
 </head>
 <body>
@@ -158,7 +162,7 @@
     <div class="progress-line" id="progress"></div>
     <div class="loading-screen" id="loader">IDENTIFYING ARCHETYPE</div>
 
-    <!-- 弹窗：已移除黑色叉叉 -->
+    <!-- 弹窗：已移除关闭按钮，点击背景即可关闭 -->
     <div id="modal" onclick="closeModal()">
         <div class="modal-body" onclick="event.stopPropagation()">
             <h3 id="modal-title" style="margin-bottom:1.5rem; font-weight:800; text-transform:uppercase; letter-spacing:0.1em;">---</h3>
@@ -193,7 +197,13 @@
                 <span class="meta-tag">XXI ARCHETYPES // Identification Result</span>
                 <div class="tutor-section"><h2 class="tutor-name" id="res-name">---</h2><span class="tutor-school" id="res-school">---</span><div class="tutor-quote" id="res-quote">---</div></div>
                 <div class="dimension-grid"><div class="dim-box"><span class="dim-head">Cognitive</span><p class="dim-val" id="dim-cog">---</p></div><div class="dim-box"><span class="dim-head">Ethics</span><p class="dim-val" id="dim-eth">---</p></div><div class="dim-box"><span class="dim-head">Ontology</span><p class="dim-val" id="dim-ont">---</p></div></div>
-                <div class="data-section"><div class="sec-header"><span class="sec-title">思想维度分析统计</span></div><div id="radar-container"><canvas id="radarChart"></canvas></div><div id="spectrums-list"></div></div>
+                
+                <div class="data-section">
+                    <div class="sec-header"><span class="sec-title">思想维度分析统计</span></div>
+                    <div id="radar-container"><canvas id="radarChart"></canvas></div>
+                    <div id="spectrums-list"></div>
+                </div>
+
                 <div class="analysis-section"><div class="sec-header"><span class="sec-title">综合解构 / ANALYSIS</span></div><div class="analysis-text" id="res-analysis">---</div></div>
                 <div class="data-section"><div class="sec-header"><span class="sec-title">进阶原著推荐 / READINGS</span></div><div id="book-list"></div></div>
                 <div class="copyright-tag">©云树cloudtree // EST. 2026 ARCHIVE</div>
@@ -217,7 +227,7 @@
 
         const questions = [
             { q: "玛丽在色盲环境中掌握了光学的所有物理数据，当她第一次看到红色：", options: [
-                { t: "她学到了新知识，物理数据无法穷尽感质。", s: { murdoch: 4, hume: 3, wittgenstein: 2 }, ref: "这是对物理主义的经典反击。它暗示主观经验中存在着某种‘溢出’，是公式和数据永远无法捕捉的灵魂余数。" },
+                { t: "她学到了新知识，物理数据无法穷尽感质。", s: { murdoch: 4, hume: 3, wittgenstein: 2 }, ref: "这是对物理主义的经典反击。它暗示主观经验中存在着某种‘溢出’，是数据永远无法捕捉的灵魂余数。" },
                 { t: "她没学到新知识，物理推演已包含了感官结果。", s: { descartes: 5, spinoza: 3, aristotle: 2 }, ref: "坚定的理性主义视角。认为感官只不过是低级的信息接收，只要逻辑链条足够完整，世界在理智面前是全透明的。" },
                 { t: "世界本身只是感知的集合。", s: { hume: 5, socrates: 2 }, ref: "休谟式的经验主义。质疑存在任何脱离感知的‘实体’。如果撤掉所有感觉，世界本身也许只是虚无。" }
             ] },
@@ -229,7 +239,7 @@
             { q: "关于‘知识’的来源，你更倾向于哪种解释？", options: [
                 { t: "知识来源于理性的先天范畴，是逻辑推演的必然。", s: { kant: 5, descartes: 4, spinoza: 4 }, ref: "先验论。认为人的大脑预装了诸如‘时间’‘因果’的软件，我们不是在认识世界，而是在用理性的网捕捉世界。" },
                 { t: "知识来源于通过对话不断剥离假象的过程。", s: { socrates: 5, arendt: 3 }, ref: "助产术。真理不在远方，而在我们通过思辨不断去除偏见、承认无知的对话过程中逐渐显影。" },
-                { t: "知识来源于感官经验的不断积累与归纳。", s: { hume: 5, mill: 3, aristotle: 3 }, ref: "素朴经验论。主张‘凡是在理智中的，没有不先在感官中的’。一切宏大理论最终都要回到细节中去验证。" }
+                { t: "知识来源于感官经验的不断积累与归纳。", s: { hume: 5, mill: 3, aristotle: 3 }, ref: "素朴经验论。主张‘凡是在理智中的，没有不先在感官中的’。认为一切宏大理论最终都要回到细节中去验证。" }
             ] },
             { q: "关于‘正义’，如果你坐在‘无知之幕’后制定规则：", options: [
                 { t: "我会制定保障最弱势群体权利的法则。", s: { rawls: 5, arendt: 3, marx: 4 }, ref: "差异原则。当你不知道自己出生是贫是富，最理性的选择是确保社会的‘底线’足够安全。" },
@@ -332,39 +342,39 @@
                 { t: "审视内心的情绪，寻找稳固的中道。", s: { aristotle: 5, aurelius: 3 }, ref: "实践智慧。不去处理那些虚无的大命题。只处理此刻的情绪，在各种冲突的极端中寻找身体的平衡点。" }
             ] },
             { q: "你如何评价一个人的‘卓越’？", options: [
-                { t: "看他是否能在各种美德中找到黄金分割点。", s: { aristotle: 5, mill: 2 }, ref: "德性平衡。卓越不是一种行为，而是一种习惯。是在各种极端的拉扯下，优雅地站在中轴线上的能力。" },
+                { t: "看他是否能在各种美德中找到黄金分割点。", s: { aristotle: 5, mill: 2 }, ref: "德性平衡。卓越不是一种习惯。是在各种极端的拉扯下，优雅地站在中轴线上的能力。" },
                 { t: "看他是否敢于挑战现有规则并自我立法。", s: { nietzsche: 5, socrates: 4 }, ref: "超人意志。平庸的人遵守秩序，卓越的人创造秩序。你必须先成为你自己的立法者。" },
-                { t: "看他是否对他人有极致深切的关注。", s: { murdoch: 5 }, ref: "他者关怀。这是一种向内的降服。最卓越的人往往是那些最能剥离自我膨胀感、极其清醒地看见他者的人。" }
+                { t: "看他是否对他人有极致深切的关注。", s: { murdoch: 5 }, ref: "他者关怀。这是一种向内的降服。剥离自我膨胀感、极其清醒地看见他者的人。" }
             ] },
             { q: "如果你发现世界是模拟的：", options: [
-                { t: "只要逻辑自洽，模拟也是真实的。", s: { descartes: 5, spinoza: 3 }, ref: "理性支点。‘真’不在于物质。如果我的逻辑链条没有断裂，我能推导出规律，那么这个宇宙对我就是真实的。" },
-                { t: "痛苦。这意味着我无法再进行本真行动。", s: { arendt: 5, heidegger: 4 }, ref: "沉沦警示。担心在这种设定好的框架里，所谓的自由意志只不过是预设的随机数，所有的‘开端性’都是虚假的。" },
-                { t: "正好。利用这份虚幻实践绝对自由。", s: { nietzsche: 5, camus: 4 }, ref: "游戏人生。既然没有了神和绝对的实在，那么我就是这个模拟宇宙的终极艺术家。我可以更疯狂地去创造。" }
+                { t: "只要逻辑自洽，模拟也是真实的。", s: { descartes: 5, spinoza: 3 }, ref: "理性支点。‘真’不在于物质。如果逻辑链条没有断裂，我能推导出规律，那么宇宙对我就是真实的。" },
+                { t: "痛苦。这意味着我无法再进行本真行动。", s: { arendt: 5, heidegger: 4 }, ref: "沉沦警示。担心在这种设定好的框架里，所谓的自由意志只不过是预设的随机数。" },
+                { t: "正好。利用这份虚幻实践绝对自由。", s: { nietzsche: 5, camus: 4 }, ref: "游戏人生。既然没有了神和绝对的实在，那么我就是这个模拟宇宙的终极艺术家。" }
             ] },
             { q: "关于‘神’或‘宇宙终极力量’：", options: [
-                { t: "它就是自然规律本身，无处不在。", s: { spinoza: 5, hegel: 3 }, ref: "泛神论。不相信一个坐在云端审判的老头，但相信这个宇宙有一套完美、严密、不容商榷的数学美感。" },
-                { t: "它是一个无法被证实的‘物自体’。", s: { kant: 5 }, ref: "理性的谦卑。承认人类理智的边界。对于边界之外的东西，我们可以假设它存在来作为道德支撑，但无法断言它存在。" },
-                { t: "它是人类在痛苦中创造出来的虚假慰藉。", s: { schopenhauer: 5, marx: 4, nietzsche: 4 }, ref: "解毒剂。认为神是人力量弱小时对自己力量的投射。我们应该收回这些投射，直面血淋淋的大地。" }
+                { t: "它就是自然规律本身，无处不在。", s: { spinoza: 5, hegel: 3 }, ref: "泛神论。不相信一个坐在云端审判的老头，但相信这个宇宙有一套完美、严密的数学美感。" },
+                { t: "它是一个无法被证实的‘物自体’。", s: { kant: 5 }, ref: "理性的谦卑。承认人类理智的边界。对于边界之外的东西，无法断言它存在。" },
+                { t: "它是人类在痛苦中创造出来的虚假慰藉。", s: { schopenhauer: 5, marx: 4, nietzsche: 4 }, ref: "解毒剂。认为神是人力量弱小时对自己力量的投射。我们应该收回这些投射。" }
             ] },
             { q: "被别人标签化时，你的感受：", options: [
-                { t: "这是解构这一权力叙事的机会。", s: { foucault: 5, socrates: 3 }, ref: "话语对抗。每一个标签都是权力的入侵。你的任务是弄清楚谁在贴标签、为了什么利益在贴标签，然后撕掉它。" },
-                { t: "标签超出了我的控制，与我无关。", s: { aurelius: 5, aristotle: 2 }, ref: "掌控内外。标签属于他人的意见。如果你被它激怒，你就成了他人的奴隶。在内心的要塞里，你依然是你。" },
+                { t: "这是解构这一权力叙事的机会。", s: { foucault: 5, socrates: 3 }, ref: "话语对抗。每一个标签都是权力的入侵。弄清楚谁在贴标签、为了什么利益在贴标签，然后撕掉它。" },
+                { t: "标签超出了我的控制，与我无关。", s: { aurelius: 5, aristotle: 2 }, ref: "掌控内外。标签属于他人的意见。如果你被它激怒，你就成了他人的奴隶。" },
                 { t: "我会通过行动证明存在先于本质。", s: { beauvoir: 5, camus: 3 }, ref: "自我超越。你不是‘什么’，你正在‘成为什么’。标签是对死物的定义，而你是一股流动的活火。" }
             ] },
             { q: "文明的意义在于：", options: [
                 { t: "摆脱自然的盲目意志，获得自由。", s: { spinoza: 5, hegel: 4 }, ref: "理性长征。文明是一部从本能的奴役走向理智自由的进化史。它是人类精神在物质荒原上的逐步显现。" },
-                { t: "建立一个让每个人展示卓越的公共空间。", s: { arendt: 5, aristotle: 3 }, ref: "卓越剧场。文明不是为了GDP或温饱，而是为了创造一个平台，让人能脱离动物性的生存，进入不朽的言说。" },
-                { t: "不断重估陈腐价值，寻找超人境界。", s: { nietzsche: 5, marx: 4 }, ref: "重估长夜。文明是在废墟上不断重建的过程。它通过一次次摧毁那些僵死的教条，来焕发新的生命强度。" }
+                { t: "建立一个让每个人展示卓越的公共空间。", s: { arendt: 5, aristotle: 3 }, ref: "卓越剧场。文明是为了创造一个平台，让人能脱离动物性的生存，进入不朽的言说。" },
+                { t: "不断重估陈腐价值，寻找超人境界。", s: { nietzsche: 5, marx: 4 }, ref: "重估长夜。文明是在废墟上不断重建的过程。它通过摧毁僵死教条，来焕发新的生命强度。" }
             ] },
             { q: "深夜思考宇宙，你感到：", options: [
-                { t: "作为思考者的理性尊严与逻辑明晰。", s: { descartes: 5, spinoza: 4 }, ref: "明晰之光。即便世界毁灭，我依然是一个正在怀疑、正在计算的孤独点。这一秒钟的觉知就是永恒的尊严。" },
-                { t: "在无限虚空中寻找那个唯一绝对的‘善’。", s: { plato: 5, murdoch: 3 }, ref: "灵魂转向。那种颤栗是对完美的向往。你深感自己的不完美，但这种深切的‘看见’正在拉升你的存在等级。" },
-                { t: "被抛入世界的‘荒谬’感与焦虑。", s: { heidegger: 5, camus: 5 }, ref: "生存焦虑。意识到你没有任何理由地出现在这里，且必须孤身一人承担所有的选择结果。这是最本真的阵痛。" }
+                { t: "作为思考者的理性尊严与逻辑明晰。", s: { descartes: 5, spinoza: 4 }, ref: "明晰之光。即便世界毁灭，我依然是一个正在怀疑、正在计算的孤独点。觉知就是尊严。" },
+                { t: "在无限虚空中寻找那个唯一绝对的‘善’。", s: { plato: 5, murdoch: 3 }, ref: "灵魂转向。那种颤栗是对完美的向往。这种深切的‘看见’正在拉升你的存在等级。" },
+                { t: "被抛入世界的‘荒谬’感与焦虑。", s: { heidegger: 5, camus: 5 }, ref: "生存焦虑。意识到你没有任何理由地出现在这里，且必须孤身一人承担所有的选择结果。" }
             ] },
             { q: "最后，那句话最触动你？", options: [
                 { t: "“位我上者灿烂星空，道德律令在我心中。”", s: { kant: 5 }, ref: "向往崇高。在无垠的外部扩张中，守住那条绝对的内部道德支点。这是理性的最高礼赞。" },
-                { t: "“凡是不可说的，保持沉默。”", s: { wittgenstein: 5 }, ref: "逻辑敬畏。划清思想的界限。对于那些玄虚的、神秘的领域，以沉默表达最高级的认知诚实。" },
-                { t: "“成为你自己。”", s: { nietzsche: 5, arendt: 3, beauvoir: 3 }, ref: "生命绽放。拒绝任何外部的裁剪。生命不是一个现成的容器，而是一场由你亲自剪辑、主演的、正在生成的长片。" }
+                { t: "“凡是不可说的，保持沉默。”", s: { wittgenstein: 5 }, ref: "逻辑敬畏。划清思想的界限。对于玄虚、神秘的领域，以沉默表达认知诚实。" },
+                { t: "“成为你自己。”", s: { nietzsche: 5, arendt: 3, beauvoir: 3 }, ref: "生命绽放。拒绝外部裁剪。生命是一场由你亲自剪辑、主演的、正在生成的长片。" }
             ] }
         ];
 
@@ -412,7 +422,7 @@
             data.options.forEach((o, idx) => {
                 const div = document.createElement('div');
                 div.className = 'opt';
-                // 已移除 ref-tag 标题行
+                // 已移除 ref-tag 标题行，背景设为浅绿
                 div.innerHTML = `${o.t}<div class="opt-ref-box">${o.ref}</div>`;
                 div.onclick = () => select(o.s, div);
                 cont.appendChild(div);
@@ -480,39 +490,54 @@
                 const bCont = document.getElementById('book-list'); bCont.innerHTML = '';
                 primary.books.forEach(b => { bCont.innerHTML += `<div class="book-box"><h4>${b.t}</h4><p>${b.r}</p></div>`; });
                 
-                const tCont = document.getElementById('hub-table'); tCont.innerHTML = '';
-                Object.values(icons).forEach(i => { tCont.innerHTML += `<tr><td>${i.name}</td><td>${i.hub.main}</td><td>${i.hub.crit}</td></tr>`; });
-                
                 show('result');
+                // 彻底修复显示不出来的核心逻辑：
+                // 1. 先进行页面切换，确保容器已处于 display:flex 状态
+                // 2. 延迟执行 Chart.js 渲染，避开动画冲突
                 setTimeout(() => {
                     renderRadar(primary.radar);
                     renderSpectrums();
-                }, 700);
+                }, 600);
             } catch (e) {
-                console.error("Result generation failed", e);
+                console.error("Result process failed", e);
                 show('result');
             }
         }
 
         function renderRadar(data) {
+            // 确保 Chart.js 已加载
+            if (typeof Chart === 'undefined') return;
+            const canvas = document.getElementById('radarChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             if(radarChart) radarChart.destroy();
-            const ctx = document.getElementById('radarChart').getContext('2d');
+            
             radarChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
                     labels: ['理性', '存在', '逻辑', '经验', '意志'],
                     datasets: [{
                         data: data,
-                        backgroundColor: 'rgba(207, 206, 255, 0.4)',
-                        borderColor: '#28352c',
+                        backgroundColor: 'rgba(79, 191, 90, 0.25)',
+                        borderColor: '#4fbf5a',
                         borderWidth: 2,
                         pointRadius: 4,
                         pointBackgroundColor: '#f7514f'
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     animation: { duration: 1500, easing: 'easeOutQuart' },
-                    scales: { r: { grid: { color: 'rgba(0,0,0,0.05)' }, angleLines: { color: 'rgba(0,0,0,0.05)' }, ticks: { display: false }, suggestedMin: 0, suggestedMax: 10 } },
+                    scales: { 
+                        r: { 
+                            grid: { color: 'rgba(0,0,0,0.05)' }, 
+                            angleLines: { color: 'rgba(0,0,0,0.05)' }, 
+                            ticks: { display: false }, 
+                            suggestedMin: 0, suggestedMax: 10,
+                            pointLabels: { font: { size: 11, weight: '600' } }
+                        } 
+                    },
                     plugins: { legend: { display: false } }
                 }
             });
@@ -524,7 +549,10 @@
             cont.innerHTML = '';
             spectrumConfigs.forEach(conf => {
                 const val = Math.random() * 60 + 20; 
-                cont.innerHTML += `<div class="spectrum-bar"><div class="spec-labels"><span>${conf.l}</span><span>${conf.r}</span></div><div class="spec-track"><div class="spec-dot" style="left: ${val}%"></div></div></div>`;
+                const item = document.createElement('div');
+                item.className = 'spectrum-bar';
+                item.innerHTML = `<div class="spec-labels"><span>${conf.l}</span><span>${conf.r}</span></div><div class="spec-track"><div class="spec-dot" style="left: ${val}%"></div></div>`;
+                cont.appendChild(item);
             });
         }
 
