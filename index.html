@@ -10,7 +10,7 @@
         :root {
             --bg: #fff37e;        /* 主色：柠檬黄 */
             --secondary: #cfceff; /* 辅色：柔紫蓝 */
-            --danger: #f7514f;    /* 核心：珊瑚红 */
+            --danger: #f7514f;    /* 核心操作：珊瑚红 */
             --success: #4fbf5a;   /* 确认：活力绿 */
             --ref-bg: #f2faf3;    /* 解读背景：流光浅绿 */
             --text-main: #28352c; /* 深墨绿 */
@@ -57,7 +57,38 @@
         .meta-bl { bottom: 40px; left: 0; writing-mode: vertical-lr; transform: rotate(180deg); }
         .brand h1 { font-family: 'Cinzel', serif; font-size: 4.2rem; letter-spacing: 0.2em; color: var(--text-main); line-height: 0.9; margin-bottom: 2rem; font-weight: 900; text-indent: 0.2em; }
         .brand p { font-family: 'Inter'; font-size: 0.6rem; letter-spacing: 0.8em; color: var(--danger); text-transform: uppercase; font-weight: 800; }
-        .hero-text { font-size: 1.15rem; line-height: 2.8; font-weight: 300; letter-spacing: 0.2em; margin: 4.5rem 0; color: var(--text-main); }
+        .hero-text { font-size: 1.15rem; line-height: 2.8; font-weight: 300; letter-spacing: 0.2em; margin: 3rem 0; color: var(--text-main); }
+        
+        /* 兑换码区域样式 */
+        .code-area { margin-bottom: 3.5rem; width: 100%; max-width: 260px; position: relative; }
+        .code-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--text-main);
+            padding: 12px 0;
+            text-align: center;
+            font-family: 'Inter';
+            font-size: 0.85rem;
+            letter-spacing: 0.4em;
+            color: var(--text-main);
+            outline: none;
+            transition: 0.4s;
+        }
+        .code-input:focus { border-bottom: 2px solid var(--danger); }
+        .code-input::placeholder { letter-spacing: 0.1em; font-weight: 300; opacity: 0.4; }
+        .code-error {
+            position: absolute;
+            bottom: -22px;
+            left: 0;
+            width: 100%;
+            font-size: 0.6rem;
+            color: var(--danger);
+            font-weight: 700;
+            display: none;
+            letter-spacing: 0.1em;
+        }
+
         .btn-main { background: var(--text-main); color: var(--bg); border: none; padding: 1.2rem 3rem; font-family: 'Inter'; font-size: 0.65rem; letter-spacing: 0.5em; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-weight: 900; box-shadow: 10px 10px 0px var(--danger); }
         .btn-main:active { transform: translate(5px, 5px); box-shadow: 0px 0px 0px var(--danger); }
         .home-copy { position: absolute; bottom: 20px; font-size: 0.45rem; color: var(--text-main); font-weight: 800; letter-spacing: 0.2em; opacity: 0.5; }
@@ -111,7 +142,7 @@
         .btn-next { background: var(--text-main); color: white; border: none; padding: 1rem 2.8rem; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; font-weight: 800; cursor: pointer; border-radius: 2px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
 
         /* --- 结果页 --- */
-        #result-poster { padding: 4rem 2rem; background: var(--card-bg); position: relative; border-radius: 4px; overflow: hidden; border: none; }
+        #result-poster { padding: 4rem 2rem; background: var(--card-bg); position: relative; border-radius: 4px; overflow: hidden; border: none; width: 100%; }
         .meta-tag { font-family: 'Inter'; font-size: 0.42rem; color: var(--text-dim); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 3rem; display: block; text-align: center; font-weight: 400; }
         .tutor-section { background: var(--grad-soft); padding: 3.5rem 1.8rem; margin-bottom: 3rem; text-align: center; border-radius: 2px; }
         .tutor-name { font-size: 3rem; color: var(--text-main); font-weight: 900; line-height: 1; margin-bottom: 0.8rem; padding: 10px 25px; display: inline-block; background: rgba(255,255,255,0.6); }
@@ -150,7 +181,7 @@
 <body>
 
     <svg style="display:none;">
-        <filter id="liquidFilter"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.012" numOctaves="3" seed="50" result="noise" /><feDisplacementMap in="SourceGraphic" in2="noise" scale="100" xChannelSelector="R" yChannelSelector="G" /></filter>
+        <filter id="liquidFilter"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.012" numOctaves="3" seed="45" result="noise" /><feDisplacementMap in="SourceGraphic" in2="noise" scale="100" xChannelSelector="R" yChannelSelector="G" /></filter>
     </svg>
 
     <div class="progress-line" id="progress"></div>
@@ -171,7 +202,14 @@
             <div class="corner-meta meta-bl">EST. 2026 PURE THEORY</div>
             <div class="brand"><h1>PHILO.</h1><p>MIND ARCHIVE IDENTIFICATION</p></div>
             <div class="hero-text">在碎片的时代，<br>重拾思辨的尊严。</div>
-            <button class="btn-main" onclick="start()">开启审视</button>
+            
+            <!-- 兑换码输入区 -->
+            <div class="code-area">
+                <input type="text" id="access-code" class="code-input" placeholder="输入兑换码解锁档案" maxlength="10">
+                <div class="code-error" id="code-error-hint">兑换码无效。</div>
+            </div>
+
+            <button class="btn-main" onclick="verifyAndStart()">开启审视</button>
             <div class="home-copy">©云树cloudtree</div>
         </section>
 
@@ -261,12 +299,12 @@
             ] },
             { q: "当你面对社会不公时，你的第一反应是：", options: [
                 { t: "通过行动与言说开启一段新的公共局面。", s: { habermas: 5, socrates: 3 }, ref: "政治行动论。不公不是用来忍受的，而是用来通过理性对话与共同行动打破沉默的。" },
-                { t: "通过实践去改变产生不公的物质基础。", s: { marx: 5, mill: 2 }, ref: "唯物史观。不谈玄虚的道德，只看谁掌握生产工具。唯有触及经济基础才是有效的。" },
+                { t: "通过实践去改变产生不公的物质基础。", s: { marx: 5, mill: 2 }, ref: "唯物史观。不谈玄虚的道德，只看谁掌握了生产工具。唯有触及经济基础才是有效的。" },
                 { t: "在理性的界限内寻求制度的公平分配。", s: { rawls: 5, kant: 3 }, ref: "法理正义。主张在不确定性中建立最公平的博弈协议。这是一种逻辑严密的制度设计思维。" }
             ] },
             { q: "当你观察科技发展时，你感到：", options: [
                 { t: "它是人类意志对自然最伟大的战胜。", s: { nietzsche: 5, descartes: 3 }, ref: "意志崇拜。认为技术是人类力量的延伸，它将带领我们超越有限的生物极限。" },
-                { t: "它是一场异化，正在抹杀人的本真性。", s: { heidegger: 5, marx: 4, schopenhauer: 2 }, ref: "异化批判。担心技术从手段变成了目的。我们成了被算法反向操纵的精密零件。" },
+                { t: "它是一场异化，正在抹杀人的本真性。", s: { heidegger: 5, marx: 4, schopenhauer: 2 }, ref: "异化批判。担心技术从手段变成了目的。我们成了被屏幕和算法反向操纵的精密零件。" },
                 { t: "它只是提升整体福祉的有效工具。", s: { mill: 4, aristotle: 2 }, ref: "实用中道。不去赋予技术神性或魔性。关键在于如何公平分配这些筹码。" }
             ] },
             { q: "面对死亡，你的直觉反应是：", options: [
@@ -290,7 +328,7 @@
                 { t: "爱是盲目意志设下的繁衍陷阱。", s: { schopenhauer: 5 }, ref: "生命意志论。极为冷峻地认为，心跳加速只不过是基因为了延续而撒下的甜蜜诱饵。" }
             ] },
             { q: "关于历史的进程，你认为：", options: [
-                { t: "历史是绝对精神通过矛盾辩证走向终点。", s: { hegel: 5, plato: 3 }, ref: "目的论历史观。认为世界历史是一部宏大的剧本，所有的冲突都是为了最终达成绝对理性的自由。" },
+                { t: "历史是绝对精神通过矛盾辩证走向终点。", s: { hegel: 5, plato: 3 }, ref: "目的论历史观。认为世界历史是一部宏大的剧本，所有的冲突都是为了最终达成某种‘绝对理性的自由’。" },
                 { t: "历史是阶级斗争与生产力变革的过程。", s: { marx: 5 }, ref: "唯物辩证法。历史不是想出来的，而是干出来的。一切文明成果背后的骨架都是生产力分配。" },
                 { t: "历史只是偶然事件的杂乱集合。", s: { hume: 5, foucault: 3 }, ref: "碎片史观。怀疑任何宏大叙事。认为历史只不过是一连串断裂的、偶然的断层。" }
             ] },
@@ -380,7 +418,7 @@
             hume: { name: "休谟", school: "EMPIRICISM", quote: "“理性是感性的奴隶。”", cog: "经验习惯", eth: "同情共感", ont: "温和怀疑", analysis: "你是一个优雅的解构者。以常识消解傲慢。只承认感官触碰到的真实。找到了可靠锚点。", books: [{t: "《人类理智研究》", r: "从迷梦中唤醒。"}], radar: [6, 4, 5, 10, 3], hub: { main: "归纳习惯", crit: "削弱定律逻辑。" } },
             aurelius: { name: "奥勒留", school: "STOICISM", quote: "“不像你的敌人。”", cog: "理性统治", eth: "内敛坚韧", ont: "精神堡垒", analysis: "你是一个内敛的守望者。具备分辨‘可控’与‘不可控’的智慧：守护内心不陷的宁静。", books: [{t: "《沉思录》", r: "修筑灵魂防线。"}], radar: [8, 7, 9, 6, 4], hub: { main: "顺应自然", crit: "麻木嫌疑。" } },
             plato: { name: "柏拉图", school: "IDEALISM", quote: "“影子之影子。”", cog: "洞穴喻", eth: "灵魂转向", ont: "永恒理式", analysis: "你是一个永恒的追光者。相信美与善是宇宙绝对的比例。在穿透影子中凝视理式。", books: [{t: "《理想国》", r: "所有哲学脚注。"}], radar: [9, 5, 8, 4, 6], hub: { main: "理式完美", crit: "忽视具体生命。" } },
-            levinas: { name: "列维纳斯", school: "ETHICS", quote: "“伦理是第一哲学。”", cog: "他者视域", eth: "面容责任", ont: "无限差异", analysis: "你是一个深情的注视者。认为认知的终点不是占有，而是对他者的降服。你在他人的面容中，触碰到超越自我的神圣责任。", books: [{t: "《整体与无限》", r: "重塑人际伦理。"}], radar: [6, 7, 5, 10, 4], hub: { main: "他者高于自我", crit: "责任过于沉重。" } },
+            levinas: { name: "列维纳斯", school: "ETHICS", quote: "“伦理是第一哲学。”", cog: "他者视域", eth: "面容责任", ont: "无限差异", analysis: "你是一个深情的注视者。认为认知的终点不是占有，而是对他者的降服。你在他人的面容中，触碰到超越自我的神探责任。", books: [{t: "《整体与无限》", r: "重塑人际伦理。"}], radar: [6, 7, 5, 10, 4], hub: { main: "他者高于自我", crit: "责任过于沉重。" } },
             rawls: { name: "罗尔斯", school: "LIBERALISM", quote: "“公平即正义。”", cog: "无知之幕", eth: "差异原则", ont: "社会契约", analysis: "你是一个理性的守护者。试图在不确定性中划定公平底线。构建一整套共生法则。", books: [{t: "《正义论》", r: "现代政治圣经。"}], radar: [8, 5, 9, 6, 5], hub: { main: "无知契约", crit: "忽视社群性。" } },
             socrates: { name: "苏格拉底", school: "CLASSICAL", quote: "“未经审视的生活不值得过。”", cog: "辩证启发", eth: "自知无知", ont: "理智德性", analysis: "你是一个提问者。通过不断揭开偏见的假象来接近真理。你认为思考本身就是最大的德性。", books: [{t: "《申辩篇》", r: "真理的力量。"}], radar: [10, 5, 8, 6, 6], hub: { main: "提问揭示真理", crit: "可能流于诡辩。" } },
             aristotle: { name: "亚里士多德", school: "VIRTUE ETHICS", quote: "“卓越是一门艺术。”", cog: "归纳逻辑", eth: "黄金中道", ont: "质料形式", analysis: "你是一个务实的秩序构建者。在两个极端之间寻找恰到好处的‘中道’。你是理性的建筑师。", books: [{t: "《尼各马可伦理学》", r: "寻找幸福。"}], radar: [8, 6, 10, 8, 4], hub: { main: "中道美德", crit: "中道界限模糊。" } },
@@ -391,6 +429,20 @@
         };
 
         let current = 0, score = {}, scoreHistory = [], radarChart = null, tempSelectionScore = null;
+
+        // 验证码校验函数
+        function verifyAndStart() {
+            const input = document.getElementById('access-code').value.trim();
+            const errorHint = document.getElementById('code-error-hint');
+            
+            if (input === "tyuiop") {
+                errorHint.style.display = "none";
+                start();
+            } else {
+                errorHint.style.display = "block";
+                document.getElementById('access-code').style.borderBottom = "2px solid #f7514f";
+            }
+        }
 
         function start() { show('quiz'); loadQ(); }
         
@@ -476,9 +528,6 @@
                 
                 const bCont = document.getElementById('book-list'); bCont.innerHTML = '';
                 primary.books.forEach(b => { bCont.innerHTML += `<div class="book-box"><h4>${b.t}</h4><p>${b.r}</p></div>`; });
-                
-                const tCont = document.getElementById('hub-table'); tCont.innerHTML = '';
-                Object.values(icons).forEach(i => { tCont.innerHTML += `<tr><td>${i.name}</td><td>${i.hub.main}</td><td>${i.hub.crit}</td></tr>`; });
                 
                 show('result');
                 setTimeout(() => {
