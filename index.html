@@ -5,15 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PHILO | 精神原型测试 2.1.8</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+SC:wght@200;300;400;500;700;900&family=Inter:wght@100;200;300;400;500;600;800&display=swap" rel="stylesheet">
-    <!-- 使用更稳定的 Chart.js 版本 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <style>
         :root {
             --bg: #fff37e;        /* 主色：柠檬黄 */
             --secondary: #cfceff; /* 辅色：柔紫蓝 */
-            --danger: #f7514f;    /* 核心：珊瑚红 */
+            --danger: #f7514f;    /* 核心操作：珊瑚红 */
             --success: #4fbf5a;   /* 确认：活力绿 */
-            --ref-bg: #f2faf3;    /* 解读背景：舒适浅绿 */
+            --ref-bg: #f2faf3;    /* 解读背景：流光浅绿 */
             --text-main: #28352c; /* 深墨绿 */
             --text-dim: #9aa59e;
             --card-bg: #ffffff;
@@ -58,7 +57,38 @@
         .meta-bl { bottom: 40px; left: 0; writing-mode: vertical-lr; transform: rotate(180deg); }
         .brand h1 { font-family: 'Cinzel', serif; font-size: 4.2rem; letter-spacing: 0.2em; color: var(--text-main); line-height: 0.9; margin-bottom: 2rem; font-weight: 900; text-indent: 0.2em; }
         .brand p { font-family: 'Inter'; font-size: 0.6rem; letter-spacing: 0.8em; color: var(--danger); text-transform: uppercase; font-weight: 800; }
-        .hero-text { font-size: 1.15rem; line-height: 2.8; font-weight: 300; letter-spacing: 0.2em; margin: 4.5rem 0; color: var(--text-main); }
+        .hero-text { font-size: 1.15rem; line-height: 2.8; font-weight: 300; letter-spacing: 0.2em; margin: 3rem 0; color: var(--text-main); }
+        
+        /* 兑换码区域样式 */
+        .code-area { margin-bottom: 3.5rem; width: 100%; max-width: 260px; position: relative; }
+        .code-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--text-main);
+            padding: 12px 0;
+            text-align: center;
+            font-family: 'Inter';
+            font-size: 0.85rem;
+            letter-spacing: 0.4em;
+            color: var(--text-main);
+            outline: none;
+            transition: 0.4s;
+        }
+        .code-input:focus { border-bottom: 2px solid var(--danger); }
+        .code-input::placeholder { letter-spacing: 0.1em; font-weight: 300; opacity: 0.4; }
+        .code-error {
+            position: absolute;
+            bottom: -22px;
+            left: 0;
+            width: 100%;
+            font-size: 0.6rem;
+            color: var(--danger);
+            font-weight: 700;
+            display: none;
+            letter-spacing: 0.1em;
+        }
+
         .btn-main { background: var(--text-main); color: var(--bg); border: none; padding: 1.2rem 3rem; font-family: 'Inter'; font-size: 0.65rem; letter-spacing: 0.5em; text-transform: uppercase; cursor: pointer; transition: 0.3s; font-weight: 900; box-shadow: 10px 10px 0px var(--danger); }
         .btn-main:active { transform: translate(5px, 5px); box-shadow: 0px 0px 0px var(--danger); }
         .home-copy { position: absolute; bottom: 20px; font-size: 0.45rem; color: var(--text-main); font-weight: 800; letter-spacing: 0.2em; opacity: 0.5; }
@@ -84,10 +114,9 @@
             position: relative;
             border-radius: 4px;
         }
-        .opt.selected { border: 1.5px solid var(--success); box-shadow: 0 5px 15px rgba(0,0,0,0.02); background: #fdfdfd; }
+        .opt.selected { border: 1.5px solid var(--success); box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
         .opt.dimmed { opacity: 0.6; transform: scale(0.98); }
         
-        /* 思想参考容器：纯文字展示，无标题行，浅绿底 */
         .opt-ref-box {
             max-height: 0;
             overflow: hidden;
@@ -123,7 +152,7 @@
         .dim-box { background: rgba(0,0,0,0.02); padding: 1.2rem 0.4rem; text-align: center; border-radius: 1px; }
         .dim-head { font-family: 'Inter'; font-size: 0.35rem; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; display: block; font-weight: 400; }
         .dim-val { font-size: 0.85rem; color: var(--danger); font-weight: 800; }
-        .data-section { margin-bottom: 3.5rem; width: 100%; }
+        .data-section { margin-bottom: 3.5rem; }
         .sec-header { display: flex; align-items: center; margin-bottom: 1.5rem; }
         .sec-title { font-family: 'Inter'; font-size: 0.75rem; color: var(--text-main); letter-spacing: 0.2em; text-transform: uppercase; font-weight: 800; }
         
@@ -145,7 +174,6 @@
         .copyright-tag { margin-top: 4rem; font-family: 'Inter'; font-size: 0.45rem; color: var(--text-main); text-align: center; padding-bottom: 50px; text-transform: uppercase; letter-spacing: 0.4em; font-weight: 800; opacity: 0.4; }
         .loading-screen { position: fixed; inset: 0; background: var(--bg); display: flex; justify-content: center; align-items: center; z-index: 2000; color: var(--text-main); font-family: 'Cinzel'; letter-spacing: 0.8em; font-size: 0.9rem; font-weight: 900; }
 
-        /* 弹窗：移除叉叉 */
         #modal { position: fixed; inset: 0; background: rgba(40, 53, 44, 0.95); z-index: 3000; display: none; justify-content: center; align-items: center; padding: 2.5rem; backdrop-filter: blur(12px); }
         .modal-body { max-width: 380px; padding: 3.5rem 3rem; background: var(--bg); position: relative; border-radius: 4px; box-shadow: 20px 20px 0px var(--danger); }
     </style>
@@ -153,16 +181,12 @@
 <body>
 
     <svg style="display:none;">
-        <filter id="liquidFilter">
-            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.012" numOctaves="3" seed="45" result="noise" />
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale="100" xChannelSelector="R" yChannelSelector="G" />
-        </filter>
+        <filter id="liquidFilter"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.012" numOctaves="3" seed="45" result="noise" /><feDisplacementMap in="SourceGraphic" in2="noise" scale="100" xChannelSelector="R" yChannelSelector="G" /></filter>
     </svg>
 
     <div class="progress-line" id="progress"></div>
     <div class="loading-screen" id="loader">IDENTIFYING ARCHETYPE</div>
 
-    <!-- 弹窗：已移除关闭按钮，点击背景即可关闭 -->
     <div id="modal" onclick="closeModal()">
         <div class="modal-body" onclick="event.stopPropagation()">
             <h3 id="modal-title" style="margin-bottom:1.5rem; font-weight:800; text-transform:uppercase; letter-spacing:0.1em;">---</h3>
@@ -178,7 +202,14 @@
             <div class="corner-meta meta-bl">EST. 2026 PURE THEORY</div>
             <div class="brand"><h1>PHILO.</h1><p>MIND ARCHIVE IDENTIFICATION</p></div>
             <div class="hero-text">在碎片的时代，<br>重拾思辨的尊严。</div>
-            <button class="btn-main" onclick="start()">开启审视</button>
+            
+            <!-- 兑换码输入区 -->
+            <div class="code-area">
+                <input type="text" id="access-code" class="code-input" placeholder="输入兑换码解锁档案" maxlength="10">
+                <div class="code-error" id="code-error-hint">兑换码无效。</div>
+            </div>
+
+            <button class="btn-main" onclick="verifyAndStart()">开启审视</button>
             <div class="home-copy">©云树cloudtree</div>
         </section>
 
@@ -197,13 +228,7 @@
                 <span class="meta-tag">XXI ARCHETYPES // Identification Result</span>
                 <div class="tutor-section"><h2 class="tutor-name" id="res-name">---</h2><span class="tutor-school" id="res-school">---</span><div class="tutor-quote" id="res-quote">---</div></div>
                 <div class="dimension-grid"><div class="dim-box"><span class="dim-head">Cognitive</span><p class="dim-val" id="dim-cog">---</p></div><div class="dim-box"><span class="dim-head">Ethics</span><p class="dim-val" id="dim-eth">---</p></div><div class="dim-box"><span class="dim-head">Ontology</span><p class="dim-val" id="dim-ont">---</p></div></div>
-                
-                <div class="data-section">
-                    <div class="sec-header"><span class="sec-title">思想维度分析统计</span></div>
-                    <div id="radar-container"><canvas id="radarChart"></canvas></div>
-                    <div id="spectrums-list"></div>
-                </div>
-
+                <div class="data-section"><div class="sec-header"><span class="sec-title">思想维度分析统计</span></div><div id="radar-container"><canvas id="radarChart"></canvas></div><div id="spectrums-list"></div></div>
                 <div class="analysis-section"><div class="sec-header"><span class="sec-title">综合解构 / ANALYSIS</span></div><div class="analysis-text" id="res-analysis">---</div></div>
                 <div class="data-section"><div class="sec-header"><span class="sec-title">进阶原著推荐 / READINGS</span></div><div id="book-list"></div></div>
                 <div class="copyright-tag">©云树cloudtree // EST. 2026 ARCHIVE</div>
@@ -218,191 +243,206 @@
     <script>
         const spectrumConfigs = [ { l: "理性主义", r: "经验主义" }, { l: "本质主义", r: "存在主义" }, { l: "个人意志", r: "社会契约" }, { l: "客观理式", r: "主观感质" } ];
         const glossary = {
-            "意志权力": { def: "尼采语。一种不断超越自我、释放生命原动力的基本欲望。", case: "不是统治他人的权力，而是战胜平庸、重复、衰弱的勇气。" },
-            "物自体": { def: "康德语。指事物脱离人的认知范畴而独立存在的本质。", case: "你看到的红苹果是知觉结果，苹果‘本身’即是物自体。" },
-            "实存": { def: "指具体的、个别的存在。强调‘我在这里’的行动感。", case: "你不是标签，而是此刻正在纠结、选择的肉体。" },
-            "权力微观运作": { def: "福柯语。指权力渗透在知识、医学、学校等细微处。", case: "正常与不正常的界定，本质上是权力的运作。" },
-            "感质": { def: "Qualia。指无法用物理公式穷尽的主观体验质感。", case: "掌握了痛觉电信号，也读不出‘痛’的感觉本身。" }
+            "意志权力": { def: "尼采语。一种不断超越自我、释放生命原动力的基本欲望。", case: "战胜平庸、重复、衰弱的勇气。" },
+            "物自体": { def: "康德语。指事物脱离人的认知范畴而独立存在的本质。", case: "苹果本身，而非你感知的红或甜。" },
+            "实存": { def: "具体的、个别的存在。强调‘我在这里’的行动感。", case: "你此刻正在纠结的选择。" },
+            "权力微观运作": { def: "福柯语。指权力渗透在知识、学校等细微处。", case: "谁界定了‘正常’。" },
+            "感质": { def: "Qualia。指无法用物理公式穷尽的主观体验质感。", case: "痛觉本身。" },
+            "绝对理性": { def: "哈贝马斯语。通过平等对话达成的程序化正义。", case: "理想的沟通情境。" }
         };
 
         const questions = [
-            { q: "玛丽在色盲环境中掌握了光学的所有物理数据，当她第一次看到红色：", options: [
-                { t: "她学到了新知识，物理数据无法穷尽感质。", s: { murdoch: 4, hume: 3, wittgenstein: 2 }, ref: "这是对物理主义的经典反击。它暗示主观经验中存在着某种‘溢出’，是数据永远无法捕捉的灵魂余数。" },
-                { t: "她没学到新知识，物理推演已包含了感官结果。", s: { descartes: 5, spinoza: 3, aristotle: 2 }, ref: "坚定的理性主义视角。认为感官只不过是低级的信息接收，只要逻辑链条足够完整，世界在理智面前是全透明的。" },
-                { t: "世界本身只是感知的集合。", s: { hume: 5, socrates: 2 }, ref: "休谟式的经验主义。质疑存在任何脱离感知的‘实体’。如果撤掉所有感觉，世界本身也许只是虚无。" }
+            { q: "玛丽在黑白房中掌握了光学的物理数据，当她第一次看到红色：", options: [
+                { t: "她学到了新知识，物理数据无法穷尽感质。", s: { levinas: 4, hume: 3, wittgenstein: 2 }, ref: "这是对物理主义的经典反击。它暗示主观经验中存在某种溢出，是数据无法捕捉的灵魂余数。" },
+                { t: "她没学到新知识，物理推演已包含了感官结果。", s: { descartes: 5, spinoza: 3, aristotle: 2 }, ref: "坚定的理性主义视角。只要逻辑链条足够完整，世界在理智面前是全透明的。" },
+                { t: "世界本身只是感知的集合。", s: { hume: 5, socrates: 2 }, ref: "休谟式的经验主义。质疑存在任何脱离感知的实体。撤掉感觉，世界也许只是虚无。" }
             ] },
             { q: "传送机在月球重建一个原子级一致的你，你认为进入舱体：", options: [
-                { t: "意味着死亡。意识的连续性断裂，自我便消亡。", s: { descartes: 5, schopenhauer: 2, kant: 2 }, ref: "强调意识的连续性与身体的唯一性。认为‘我’不是一组数据，而是一个不可复制的、时空连续的生命节点。" },
-                { t: "意味着存续。内存一致，我即是我。", s: { hume: 5, mill: 2, rawls: 2 }, ref: "功能主义观点。认为自我只不过是记忆、性格和情感的综合。只要软件内容一致，硬件的更换不影响同一性。" },
-                { t: "意味着一种动态的生成过程。", s: { beauvoir: 5, nietzsche: 3, hegel: 3 }, ref: "反本质主义视角。认为并没有一个永恒不变的‘自我’核。每一次毁灭与重建，都是生命在处境中新一轮的‘生成’。" }
+                { t: "意味着死亡。意识的连续性断裂，自我便消亡。", s: { descartes: 5, schopenhauer: 2, kant: 2 }, ref: "强调意识的连续性。认为我不是一组数据，而是一个不可复制的生命节点。" },
+                { t: "意味着存续。内存一致，我即是我。", s: { hume: 5, mill: 2, rawls: 2 }, ref: "功能主义观点。只要软件内容一致，硬件的更换不影响同一性。" },
+                { t: "意味着一种动态的生成过程。", s: { sartre: 5, nietzsche: 3, hegel: 3 }, ref: "反本质主义视角。认为并没有一个永恒不变的自我核。每一次都是生命新一轮的生成。" }
             ] },
-            { q: "关于‘知识’的来源，你更倾向于哪种解释？", options: [
-                { t: "知识来源于理性的先天范畴，是逻辑推演的必然。", s: { kant: 5, descartes: 4, spinoza: 4 }, ref: "先验论。认为人的大脑预装了诸如‘时间’‘因果’的软件，我们不是在认识世界，而是在用理性的网捕捉世界。" },
-                { t: "知识来源于通过对话不断剥离假象的过程。", s: { socrates: 5, arendt: 3 }, ref: "助产术。真理不在远方，而在我们通过思辨不断去除偏见、承认无知的对话过程中逐渐显影。" },
-                { t: "知识来源于感官经验的不断积累与归纳。", s: { hume: 5, mill: 3, aristotle: 3 }, ref: "素朴经验论。主张‘凡是在理智中的，没有不先在感官中的’。认为一切宏大理论最终都要回到细节中去验证。" }
+            { q: "关于知识的来源，你更倾向于哪种解释？", options: [
+                { t: "知识来源于理性的先天范畴，是逻辑推演的必然。", s: { kant: 5, descartes: 4, spinoza: 4 }, ref: "先验论。认为人的大脑预装了诸如‘因果’的软件，我们在用理性的网捕捉世界。" },
+                { t: "知识来源于通过对话不断剥离假象的过程。", s: { socrates: 5, habermas: 3 }, ref: "助产术。真理在我们通过思辨不断去除偏见、承认无知的对话过程中逐渐显影。" },
+                { t: "知识来源于感官经验的不断积累与归纳。", s: { hume: 5, mill: 3, aristotle: 3 }, ref: "素朴经验论。主张凡是在理智中的，没有不先在感官中的。" }
             ] },
-            { q: "关于‘正义’，如果你坐在‘无知之幕’后制定规则：", options: [
-                { t: "我会制定保障最弱势群体权利的法则。", s: { rawls: 5, arendt: 3, marx: 4 }, ref: "差异原则。当你不知道自己出生是贫是富，最理性的选择是确保社会的‘底线’足够安全。" },
-                { t: "我会追求整体效用的最大化。", s: { mill: 5 }, ref: "功利主义。认为正义就是‘最大多数人的最大幸福’。在这种计算中，个体的痛苦有时被视为换取全局利益的代价。" },
-                { t: "正义应是在既定规则下的理性契约。", s: { kant: 5, aristotle: 2 }, ref: "契约论。强调程序的正义。正义不是结果的平等，而是每个人都基于理智签署的一套不可违背的共同行为准则。" }
+            { q: "关于正义，如果你坐在无知之幕后制定规则：", options: [
+                { t: "我会制定保障最弱势群体权利的法则。", s: { rawls: 5, habermas: 3, marx: 4 }, ref: "差异原则。当你不知道自己出生是贫是富，最理性的选择是确保底线足够安全。" },
+                { t: "我会追求整体效用的最大化。", s: { mill: 5 }, ref: "功利主义。认为正义就是最大多数人的最大幸福。个体的痛苦有时被视为必要代价。" },
+                { t: "正义应是在既定规则下的理性契约。", s: { kant: 5, aristotle: 2 }, ref: "契约论。强调程序的正义。正义是每个人都基于理智签署的一套共同行为准则。" }
             ] },
-            { q: "维特根斯坦的甲虫：每个人盒子里有个叫‘甲虫’的东西，语言能传递真相吗？", options: [
-                { t: "不能。语言只是我们玩的一种社会游戏。", s: { wittgenstein: 5, foucault: 3, nietzsche: 2 }, ref: "语言游戏论。语言的意义在于它的使用方式，而不是它指向了什么绝对真理。我们只是在共享一套沟通协议。" },
+            { q: "维特根斯坦的甲虫：每个人盒子里有个叫甲虫的东西，语言能传递真相吗？", options: [
+                { t: "不能。语言只是我们玩的一种社会游戏。", s: { wittgenstein: 5, foucault: 3, nietzsche: 2 }, ref: "语言游戏论。语言的意义在于它的使用方式。我们只是在共享一套沟通协议。" },
                 { t: "能。语言是对客观理式的对应反射。", s: { plato: 5, descartes: 3, hegel: 2 }, ref: "符合论真理观。坚信词语背后对应着某种坚固的实在。语言是通往绝对理念的梯子。" },
-                { t: "能。语言虽然粗糙，但能传达经验共鸣。", s: { hume: 5, aristotle: 2 }, ref: "实用主义语言观。不追求终极的一致，只追求在具体的感官经验中达成一种可用的‘共振’。" }
+                { t: "能。语言虽然粗糙，但能传达经验共鸣。", s: { hume: 5, aristotle: 2 }, ref: "实用主义语言观。不追求终极的一致，只追求在具体的感官经验中达成一种可用的共振。" }
             ] },
             { q: "失控电车前，不作为会死5人，拉闸会死1人：", options: [
                 { t: "拉闸。为最大幸福选择最小牺牲。", s: { mill: 5, rawls: 2 }, ref: "目的论。结果决定行为的道德性。这是一种典型的效率至上的伦理计算法。" },
-                { t: "不拉。拒绝将人仅仅视为计算工具。", s: { kant: 5, murdoch: 3, aurelius: 2 }, ref: "义务论。人本身即是目的，而不是工具。无论结果如何，你都没有权力通过谋杀一个无辜者来解决危机。" },
-                { t: "道德选择本质是一场权力的凝视。", s: { foucault: 5, nietzsche: 3 }, ref: "道德解构。质疑这种设定好的‘困境’本身就是一种话语权力的规训。这种视角倾向于跳出逻辑陷阱。" }
+                { t: "不拉。拒绝将人仅仅视为计算工具。", s: { kant: 5, levinas: 3, aurelius: 2 }, ref: "义务论。人本身即是目的。无论结果如何，你都没有权力通过谋杀一个无辜者来解决危机。" },
+                { t: "道德选择本质是一场权力的凝视。", s: { foucault: 5, nietzsche: 3 }, ref: "道德解构。质疑这种设定好的困境本身就是一种话语权力的规训。" }
             ] },
-            { q: "关于‘美’的本质，你的第一直觉是：", options: [
+            { q: "关于美的本质，你的第一直觉是：", options: [
                 { t: "美是客观存在的、永恒不变的比例与理式。", s: { plato: 5, spinoza: 3 }, ref: "客观美学。美是宇宙的底层数学比例，即便人类消亡，那种神圣的秩序依然存在。" },
-                { t: "美是主观感知的愉悦，是同情心的共鸣。", s: { hume: 5, murdoch: 4 }, ref: "主观美学。美不在物体本身，而在于观看者的眼睛。它是人类情感对世界的一次温情投射。" },
-                { t: "美是生命力对荒谬世界的最高反击。", s: { nietzsche: 5, camus: 4 }, ref: "艺术救赎论。世界本身是混乱且荒谬的，艺术是人为了生存而强行赋予这个混乱世界的‘意志形式’。" }
+                { t: "美是主观感知的愉悦，是同情心的共鸣。", s: { hume: 5, levinas: 4 }, ref: "主观美学。美不在物体本身，而在于观看者的眼睛。它是人类情感对世界的一次投射。" },
+                { t: "美是生命力对荒谬世界的最高反击。", s: { nietzsche: 5, camus: 4 }, ref: "艺术救赎论。世界本身是混乱且荒谬的，艺术是人强行赋予这个混乱世界的意志形式。" }
             ] },
             { q: "如果AI能模拟人类的一切情感并写出感人的情书：", options: [
-                { t: "它拥有灵魂，因为它符合爱的理式。", s: { plato: 5, hegel: 3 }, ref: "观念论视角。灵魂不在肉体中，而在于是否具备了那种高阶的、合乎逻辑的表达与理念形态。" },
-                { t: "它没有灵魂，它缺乏具体的生存处境。", s: { beauvoir: 5, heidegger: 4, camus: 3 }, ref: "具身认知。认为灵魂产生于血肉之躯的有限性和对死亡的牵念。代码可以模拟表达，但无法模拟‘处境’。" },
-                { t: "灵魂不过是复杂的算法逻辑。", s: { descartes: 4, spinoza: 3 }, ref: "还原主义。既然人类也是由电信号驱动的复杂机器，那么灵魂只是某种高阶计算的结果而已。" }
+                { t: "它拥有灵魂，因为它符合爱的理式。", s: { plato: 5, hegel: 3 }, ref: "观念论视角。灵魂不在肉体中，而在于是否具备了那种高阶的表达与理念形态。" },
+                { t: "它没有灵魂，它缺乏具体的生存处境。", s: { sartre: 5, heidegger: 4, camus: 3 }, ref: "具身认知。认为灵魂产生于血肉之躯的有限性和对死亡的牵念。代码无法模拟处境。" },
+                { t: "灵魂不过是复杂的算法逻辑。", s: { descartes: 4, spinoza: 3 }, ref: "还原主义。既然人类也是由电信号驱动的复杂机器，那么灵魂只是某种高阶计算的结果。" }
             ] },
             { q: "西西弗斯推石上山是徒劳的，你认为：", options: [
-                { t: "他在对无意义的过程进行主动肯定时是幸福的。", s: { nietzsche: 5, camus: 5, heidegger: 3 }, ref: "西西弗的反抗。通过对虚无的‘肯定’，你成为了你命运的主人。这种幸福是骄傲且强韧的。" },
-                { t: "这种痛苦说明了生命意志的盲目性。", s: { schopenhauer: 5 }, ref: "唯意志论。认为生命是一团无理性的欲望，满足了即无聊，满足不了即痛苦。循环推石就是生存的真实缩影。" },
-                { t: "幸福在于在必然的规律中寻找内心的宁静。", s: { aurelius: 5, spinoza: 4 }, ref: "斯多葛主义。认清推石是不可改变的宇宙律令，在不偏不倚的理性观察中，获得精神的绝对堡垒。" }
+                { t: "他在对无意义的过程进行主动肯定时是幸福的。", s: { nietzsche: 5, camus: 5, heidegger: 3 }, ref: "西西弗的反抗。通过对虚无的肯定，你成为了你命运的主人。这种幸福是骄傲且强韧的。" },
+                { t: "这种痛苦说明了生命意志的盲目性。", s: { schopenhauer: 5 }, ref: "唯意志论。认为生命是一团无理性的欲望，满足了即无聊，满足不了即痛苦。" },
+                { t: "幸福在于在必然的规律中寻找内心的宁静。", s: { aurelius: 5, spinoza: 4 }, ref: "斯多葛主义。认清推石是宇宙律令，在不偏不倚的理性观察中，获得精神的绝对堡垒。" }
             ] },
             { q: "当你面对社会不公时，你的第一反应是：", options: [
-                { t: "通过行动与言说开启一段新的公共局面。", s: { arendt: 5, socrates: 3 }, ref: "政治行动论。认为人的本质在于公共领域的登场。不公不是用来忍受的，而是用来通过行动打破沉默的。" },
-                { t: "通过实践去改变产生不公的物质基础。", s: { marx: 5, mill: 2 }, ref: "唯物史观。不谈玄虚的道德，只看谁掌握了生产工具。变革唯有触及经济基础才是有效的。" },
-                { t: "在理性的界限内寻求制度的公平分配。", s: { rawls: 5, kant: 3 }, ref: "法理正义。主张在不确定性中建立最公平的博弈协议。这是一种极其冷静、逻辑严密的制度设计思维。" }
+                { t: "通过行动与言说开启一段新的公共局面。", s: { habermas: 5, socrates: 3 }, ref: "政治行动论。不公不是用来忍受的，而是用来通过理性对话与共同行动打破沉默的。" },
+                { t: "通过实践去改变产生不公的物质基础。", s: { marx: 5, mill: 2 }, ref: "唯物史观。不谈玄虚的道德，只看谁掌握了生产工具。唯有触及经济基础才是有效的。" },
+                { t: "在理性的界限内寻求制度的公平分配。", s: { rawls: 5, kant: 3 }, ref: "法理正义。主张在不确定性中建立最公平的博弈协议。这是一种逻辑严密的制度设计思维。" }
             ] },
             { q: "当你观察科技发展时，你感到：", options: [
-                { t: "它是人类意志对自然最伟大的战胜。", s: { nietzsche: 5, descartes: 3 }, ref: "意志崇拜。认为技术是人类力量的延伸，它将带领我们超越有限的生物极限，重塑世界。" },
+                { t: "它是人类意志对自然最伟大的战胜。", s: { nietzsche: 5, descartes: 3 }, ref: "意志崇拜。认为技术是人类力量的延伸，它将带领我们超越有限的生物极限。" },
                 { t: "它是一场异化，正在抹杀人的本真性。", s: { heidegger: 5, marx: 4, schopenhauer: 2 }, ref: "异化批判。担心技术从手段变成了目的。我们成了被屏幕和算法反向操纵的精密零件。" },
-                { t: "它只是提升整体福祉的有效工具。", s: { mill: 4, aristotle: 2 }, ref: "实用中道。不去赋予技术神性或魔性。它只是在天平上增加筹码的砝码，关键在于如何分配这些筹码。" }
+                { t: "它只是提升整体福祉的有效工具。", s: { mill: 4, aristotle: 2 }, ref: "实用中道。不去赋予技术神性或魔性。关键在于如何公平分配这些筹码。" }
             ] },
             { q: "面对死亡，你的直觉反应是：", options: [
-                { t: "它是虚无的终点，应以理性的尊严去接纳。", s: { aurelius: 5, spinoza: 3 }, ref: "理性平静。将死亡视为自然代谢的一部分。既然它必然发生，那么最好的尊严就是无动于衷地接纳它。" },
-                { t: "唯有面对死亡，才能开启本真生存。", s: { heidegger: 5, beauvoir: 3, camus: 3 }, ref: "向死而生。死亡不是终点，而是倒计时的闹钟。它时刻提醒你：你现在的时间是有限的，你应该做点什么。" },
-                { t: "死亡证明了盲目意志终将回归虚无。", s: { schopenhauer: 5 }, ref: "虚无寂静。将死亡视为一种解脱，生命意志那永无止境的干渴终于在这一刻得到了永久的熄灭。" }
+                { t: "它是虚无的终点，应以理性的尊严去接纳。", s: { aurelius: 5, spinoza: 3 }, ref: "理性平静。将死亡视为自然代谢。既然它必然发生，最好的尊严就是无动于衷地接纳它。" },
+                { t: "唯有面对死亡，才能开启本真生存。", s: { heidegger: 5, sartre: 3, camus: 3 }, ref: "向死而生。死亡不是终点，而是倒计时的闹钟。它时刻提醒你：你现在的时间是有限的。" },
+                { t: "死亡证明了盲目意志终将回归虚无。", s: { schopenhauer: 5 }, ref: "虚无寂静。将死亡视为解脱，生命意志那永无止境的干渴终于在这一刻得到了永久的熄灭。" }
             ] },
-            { q: "关于‘法律’，你认为它的核心价值是：", options: [
-                { t: "它是文明对绝对道德律令的成文化。", s: { kant: 5, plato: 3, hegel: 4 }, ref: "法自然观。法律不是人拍脑袋想出来的，而是对宇宙或理性背后那条永恒正义律条的翻译。" },
-                { t: "它是各利益主体达成的契约公平。", s: { rawls: 5, mill: 3 }, ref: "契约实用主义。法律只是一套为了让大家能一起过日子而商量出来的平衡游戏规则。" },
-                { t: "它是权力在人群中划定的控制边界。", s: { foucault: 5, nietzsche: 3 }, ref: "谱系解构。认为法律本身没有神圣性，它只是胜利者用来圈定谁是‘正常人’、谁是‘罪犯’的红线。" }
+            { q: "关于法律，你认为它的核心价值是：", options: [
+                { t: "它是文明对绝对道德律令的成文化。", s: { kant: 5, plato: 3, hegel: 4 }, ref: "法自然观。法律不是人拍脑袋想出来的，而是对宇宙背后永恒正义律条的翻译。" },
+                { t: "它是各利益主体达成的契约公平。", s: { rawls: 5, mill: 3 }, ref: "契约实用主义。法律只是一套为了让大家能一起过日子而商量出来的博弈规则。" },
+                { t: "它是权力在人群中划定的控制边界。", s: { foucault: 5, nietzsche: 3 }, ref: "谱系解构。认为法律本身没有神圣性，它只是胜利者用来圈定谁是正常人的红线。" }
             ] },
             { q: "如果你能活在完美的模拟快乐机器里：", options: [
-                { t: "拒绝。真实的痛苦胜过虚假的快乐。", s: { heidegger: 5, camus: 5, murdoch: 3 }, ref: "真实优先论。宁愿在荒原上自由地流浪，也不愿在恒温箱里做一场逻辑自洽的美梦。认为‘真实’具有最高优先级。" },
-                { t: "接受。快乐的效用是生命的终极价值。", s: { mill: 5 }, ref: "终极快感论。认为生命的一切追求最终都指向感觉。如果结果是极致愉悦的，过程是否模拟其实不重要。" },
-                { t: "取决于我是否能通过意志主动肯定它。", s: { nietzsche: 5, socrates: 3 }, ref: "主观肯定论。认为真假是一个伪命题。如果你具备某种强大的创造力，即便在模拟中，你也能开辟出属于你的疆域。" }
+                { t: "拒绝。真实的痛苦胜过虚假的快乐。", s: { heidegger: 5, camus: 5, levinas: 3 }, ref: "真实优先论。宁愿在荒原上自由地流浪，也不愿在恒温箱里做一场逻辑自洽的美梦。" },
+                { t: "接受。快乐的效用是生命的终极价值。", s: { mill: 5 }, ref: "终极快感论。认为生命的一切追求最终都指向感觉。只要结果愉悦，过程是否模拟并不重要。" },
+                { t: "取决于我是否能通过意志主动肯定它。", s: { nietzsche: 5, socrates: 3 }, ref: "主观肯定论。认为真假是一个伪命题。如果你具备强大的创造力，即便在模拟中，你也能开辟疆域。" }
             ] },
-            { q: "关于‘爱’，你的看法是：", options: [
-                { t: "爱是对另一个灵魂无私的、极其清晰的关注。", s: { murdoch: 5, arendt: 3 }, ref: "向善美学。爱不是索取，而是通过对他者的凝视，把自己从那自私、贪婪的幻象中拉出来的训练。" },
-                { t: "爱是两个自由主体共同超越处境的冒险。", s: { beauvoir: 5, camus: 2 }, ref: "自由生成的爱。拒绝把爱当成归宿或枷锁。爱是两个灵魂在不确定性中的并肩奔跑。" },
-                { t: "爱是盲目意志设下的繁衍陷阱。", s: { schopenhauer: 5 }, ref: "生命意志论。极为冷峻地认为，那份心跳加速只不过是基因为了在下一代延续而撒下的甜蜜诱饵。" }
+            { q: "关于爱，你的看法是：", options: [
+                { t: "爱是对另一个灵魂无私的、极其清晰的关注。", s: { levinas: 5, habermas: 3 }, ref: "向善美学。爱不是索取，而是通过对他者的凝视，把自己从那自私、贪婪的幻象中拉出来的训练。" },
+                { t: "爱是两个自由主体共同超越处境的冒险。", s: { sartre: 5, camus: 2 }, ref: "自由生成的爱。拒绝把爱当成归宿或枷锁。爱是两个灵魂在不确定性中的并肩奔跑。" },
+                { t: "爱是盲目意志设下的繁衍陷阱。", s: { schopenhauer: 5 }, ref: "生命意志论。极为冷峻地认为，心跳加速只不过是基因为了延续而撒下的甜蜜诱饵。" }
             ] },
-            { q: "关于‘历史’的进程，你认为：", options: [
-                { t: "历史是‘绝对精神’通过矛盾辩证走向终点。", s: { hegel: 5, plato: 3 }, ref: "目的论历史观。认为世界历史是一部宏大的剧本，所有的冲突都是为了最终达成某种‘绝对理性的自由’。" },
-                { t: "历史是阶级斗争与生产力变革的过程。", s: { marx: 5 }, ref: "唯物辩证法。历史不是想出来的，而是干出来的。一切文明成果背后的骨架都是生产力与分配关系。" },
-                { t: "历史只是偶然事件的杂乱集合。", s: { hume: 5, foucault: 3 }, ref: "碎片史观。怀疑任何‘宏大叙事’。认为历史只不过是一连串断裂的、偶然的断层，没有必然的终点。" }
+            { q: "关于历史的进程，你认为：", options: [
+                { t: "历史是绝对精神通过矛盾辩证走向终点。", s: { hegel: 5, plato: 3 }, ref: "目的论历史观。认为世界历史是一部宏大的剧本，所有的冲突都是为了最终达成某种‘绝对理性的自由’。" },
+                { t: "历史是阶级斗争与生产力变革的过程。", s: { marx: 5 }, ref: "唯物辩证法。历史不是想出来的，而是干出来的。一切文明成果背后的骨架都是生产力分配。" },
+                { t: "历史只是偶然事件的杂乱集合。", s: { hume: 5, foucault: 3 }, ref: "碎片史观。怀疑任何宏大叙事。认为历史只不过是一连串断裂的、偶然的断层。" }
             ] },
             { q: "你在公共场所疾呼理想，是因为：", options: [
-                { t: "我希望开启一段不确定的新局面。", s: { arendt: 5, marx: 3 }, ref: "公共性。认为人生的意义在于离开私人的洞穴，在他人面前展示你的言说与卓越。" },
-                { t: "我必须对我心中的绝对道德法则负责。", s: { kant: 5, aurelius: 3 }, ref: "绝对律令。你做这件事不是为了赢，也不是为了别人看见，仅仅是因为你不这样做就违背了理性的尊严。" },
-                { t: "我试图重估现有的、腐朽的价值体系。", s: { nietzsche: 5, foucault: 4 }, ref: "价值重估。认为现存的所谓理想已经腐臭。你的发声是为了清除垃圾，为新的生命力腾出空间。" }
+                { t: "我希望开启一段不确定的新局面。", s: { habermas: 5, marx: 3 }, ref: "公共性。认为人生的意义在于离开私人的洞穴，在他人面前展示你的言说与卓越。" },
+                { t: "我必须对我心中的绝对道德法则负责。", s: { kant: 5, aurelius: 3 }, ref: "绝对律令。你做这件事不是为了赢，仅仅是因为你不这样做就违背了理性的尊严。" },
+                { t: "我试图重估现有的、腐朽的价值体系。", s: { nietzsche: 5, foucault: 4 }, ref: "价值重估。认为现存理想已经腐臭。你的发声是为了清除垃圾，为新的生命力腾出空间。" }
             ] },
-            { q: "你认为‘孤独’的本质是：", options: [
-                { t: "剥离虚伪后，与自己进行的最真诚对话。", s: { aurelius: 5, socrates: 4, heidegger: 3 }, ref: "精神内室。孤独不是一种缺失，而是一种获得——获得了审视所有未经检验的生活的绝佳距离。" },
-                { t: "一种缺乏公共参与、缺乏言说的状态。", s: { arendt: 5 }, ref: "失语焦虑。认为人是政治动物。如果你无法通过语言在公共领域留下痕迹，那种孤独是具有毁灭性的。" },
-                { t: "认清了生命悲剧底色后的绝对宁静。", s: { schopenhauer: 5, spinoza: 3 }, ref: "悲剧智慧。当你意识到万物皆流、诸行无常，孤独便成为一种不再期待、不再失望的终极安全感。" }
+            { q: "你认为孤独的本质是：", options: [
+                { t: "剥离虚伪后，与自己进行的最真诚对话。", s: { aurelius: 5, socrates: 4, heidegger: 3 }, ref: "精神内室。孤独不是一种缺失，而是一种获得——获得了审视未经检验生活的绝佳距离。" },
+                { t: "一种缺乏公共参与、缺乏言说的状态。", s: { habermas: 5 }, ref: "失语焦虑。认为人是政治动物。如果你无法通过语言留下痕迹，那种孤独是具有毁灭性的。" },
+                { t: "认清了生命悲剧底色后的绝对宁静。", s: { schopenhauer: 5, spinoza: 3 }, ref: "悲剧智慧。当你意识到万物皆流、诸行无常，孤独便成为一种不再期待、不再失望的安全感。" }
             ] },
             { q: "看到压迫感的大型建筑时，你的反应是：", options: [
-                { t: "它体现了理性的崇高与秩序。", s: { plato: 4, kant: 3, hegel: 4 }, ref: "秩序美学。认为庞大的几何体是人类理智对混乱大地的胜利，它承载着秩序与恒久的力量。" },
-                { t: "它让人联想到权力威慑与规训。", s: { foucault: 5, nietzsche: 2 }, ref: "空间权力学。敏锐地察觉到这种尺度正在把人变小，它是建筑形式的‘微观权力’，在潜意识里诱导你的服从。" },
-                { t: "它只是宏伟的感官经验片段。", s: { hume: 5 }, ref: "极简经验。拒绝任何形而上学的联想。它只是一堆巨大的石头在视网膜上留下的阴影，仅此而已。" }
+                { t: "它体现了理性的崇高与秩序。", s: { plato: 4, kant: 3, hegel: 4 }, ref: "秩序美学。认为庞大的几何体是人类理智对混乱大地的胜利，它承载着恒久的力量。" },
+                { t: "它让人联想到权力威慑与规训。", s: { foucault: 5, nietzsche: 2 }, ref: "空间权力学。敏锐地察觉到这种尺度正在把人变小，它是建筑形式对潜意识的规训。" },
+                { t: "它只是宏伟的感官经验片段。", s: { hume: 5 }, ref: "极简经验。拒绝任何形而上学的联想。它只是一堆巨大的石头在视网膜上留下的阴影。" }
             ] },
             { q: "如果让你对一个恶人行善：", options: [
                 { t: "我会做。行善是我的绝对义务。", s: { kant: 5, aurelius: 3 }, ref: "定言令回。善的行为必须具备普遍性。你对他行善，是在维护你自己作为一个理性主体的最高法律。" },
-                { t: "我会做。这是练习‘无私关注’他者的时刻。", s: { murdoch: 5, socrates: 3 }, ref: "关注美德。善不在于结果，而在于那一刻你是否真的‘看见’了那个受苦的灵魂，即便它是邪恶的。" },
+                { t: "我会做。这是练习无私关注他者的时刻。", s: { levinas: 5, socrates: 3 }, ref: "伦理优先论。善不在于结果，而在于那一刻你是否真的看见了那个受苦的灵魂，即便它是邪恶的。" },
                 { t: "不做。这不符合理性的效用原则。", s: { mill: 5, aristotle: 3 }, ref: "中道计算。行善也需要智慧。如果不分黑白，这种善在全局博弈中只会导致恶的增殖。" }
             ] },
-            { q: "你认为‘艺术’应该是：", options: [
-                { t: "让人看见超越现实的善。", s: { murdoch: 5, plato: 3 }, ref: "实在论艺术。认为艺术是通往‘真理’的桥梁，它通过美来诱导我们这些视觉动物走向善的方向。" },
-                { t: "展现政治多元性、打破沉默的媒介。", s: { arendt: 5, marx: 3 }, ref: "介入艺术。认为躲在象牙塔里画花鸟鱼虫是不道德的。艺术必须在公共广场上发出刺耳的哨声。" },
-                { t: "意志对虚无主义的最强力反击。", s: { nietzsche: 5, camus: 4 }, ref: "超人美学。艺术是给这个荒谬、残酷的宇宙镀上的一层金，让人能在绝望中活下去，并活得精彩。" }
+            { q: "你认为艺术应该是：", options: [
+                { t: "让人看见超越现实的善。", s: { levinas: 5, plato: 3 }, ref: "超越论艺术。认为艺术是通往真理的桥梁，它通过美来诱导我们这些视觉动物走向善的方向。" },
+                { t: "展现政治多元性、打破沉默的媒介。", s: { habermas: 5, marx: 3 }, ref: "介入艺术。认为艺术必须在公共广场上发出刺耳的哨声，揭示社会真实的底色。" },
+                { t: "意志对虚无主义的最强力反击。", s: { nietzsche: 5, camus: 4 }, ref: "超人美学。艺术是给这个荒谬、残酷宇宙镀上的一层金，让人能在绝望中活得精彩。" }
             ] },
-            { q: "‘忒修斯之船’：全换了木板后，它还是那艘吗？", options: [
-                { t: "是。它承载的灵魂（理式）未变。", s: { plato: 5, hegel: 3 }, ref: "理式同一性。认为‘船’的本质在于它的设计图纸或它的名字所代表的抽象理念，而不是那几块烂木头。" },
-                { t: "不是。物理已变，身份只是标签。", s: { wittgenstein: 5, hume: 4 }, ref: "名实解构。认为‘同一性’只是语言习惯。我们为了省事给它贴了个旧标签，但事实是那一刻万物皆流。" },
-                { t: "它是一个不断生成的‘过程’。", s: { beauvoir: 5, arendt: 3 }, ref: "生成哲学。承认变化本身才是唯一的永恒。船不是一堆固定的物质，而是一个正在发生的时空事件。" }
+            { q: "忒修斯之船：全换了木板后，它还是那艘吗？", options: [
+                { t: "是。它承载的灵魂（理式）未变。", s: { plato: 5, hegel: 3 }, ref: "理式同一性。认为船的本质在于它的设计图纸或它的名字所代表的抽象理念，而非烂木头。" },
+                { t: "不是。物理已变，身份只是标签。", s: { wittgenstein: 5, hume: 4 }, ref: "名实解构。认为同一性只是语言习惯。事实是那一刻万物皆流，本质早已消散。" },
+                { t: "它是一个不断生成的过程。", s: { sartre: 5, habermas: 3 }, ref: "生成哲学。承认变化本身才是唯一的永恒。船不是固定的物质，而是一个正在发生的时空事件。" }
             ] },
-            { q: "面对人生中突如其来的‘荒谬’感，你会：", options: [
+            { q: "面对人生中突如其来的荒谬感，你会：", options: [
                 { t: "通过反抗荒谬，在无意义中创造意义。", s: { camus: 5, nietzsche: 4 }, ref: "西西弗的反思。承认荒谬，然后迎头撞上去。你的意义就产生于你与这种无意义的博弈瞬间。" },
-                { t: "通过理性的分析，寻找必然的逻辑链条。", s: { spinoza: 5, descartes: 4 }, ref: "必然解药。荒谬只是因为你还没看清局部的逻辑。当你站在宇宙的高度俯瞰，一切必然都有其位。" },
-                { t: "审视内心的情绪，寻找稳固的中道。", s: { aristotle: 5, aurelius: 3 }, ref: "实践智慧。不去处理那些虚无的大命题。只处理此刻的情绪，在各种冲突的极端中寻找身体的平衡点。" }
+                { t: "通过理性的分析，寻找必然的逻辑链条。", s: { spinoza: 5, descartes: 4 }, ref: "必然解药。荒谬只是因为你还没看清局部的逻辑。站在宇宙的高度，一切必然都有其位。" },
+                { t: "审视内心的情绪，寻找稳固的中道。", s: { aristotle: 5, aurelius: 3 }, ref: "实践智慧。不去处理那些虚无的大命题。在各种冲突的极端中寻找身体的平衡点。" }
             ] },
-            { q: "你如何评价一个人的‘卓越’？", options: [
-                { t: "看他是否能在各种美德中找到黄金分割点。", s: { aristotle: 5, mill: 2 }, ref: "德性平衡。卓越不是一种习惯。是在各种极端的拉扯下，优雅地站在中轴线上的能力。" },
+            { q: "你如何评价一个人的卓越？", options: [
+                { t: "看他是否能在各种美德中找到黄金分割点。", s: { aristotle: 5, mill: 2 }, ref: "德性平衡。卓越不是一种行为，而是一种习惯。是在各种极端拉扯下，优雅地站在中轴线上的能力。" },
                 { t: "看他是否敢于挑战现有规则并自我立法。", s: { nietzsche: 5, socrates: 4 }, ref: "超人意志。平庸的人遵守秩序，卓越的人创造秩序。你必须先成为你自己的立法者。" },
-                { t: "看他是否对他人有极致深切的关注。", s: { murdoch: 5 }, ref: "他者关怀。这是一种向内的降服。剥离自我膨胀感、极其清醒地看见他者的人。" }
+                { t: "看他是否对他者有极致深切的关注。", s: { levinas: 5 }, ref: "他者关怀。这是一种向内的降服。最卓越的人往往是那些最能剥离自我膨胀感、清醒看见他者的人。" }
             ] },
             { q: "如果你发现世界是模拟的：", options: [
-                { t: "只要逻辑自洽，模拟也是真实的。", s: { descartes: 5, spinoza: 3 }, ref: "理性支点。‘真’不在于物质。如果逻辑链条没有断裂，我能推导出规律，那么宇宙对我就是真实的。" },
-                { t: "痛苦。这意味着我无法再进行本真行动。", s: { arendt: 5, heidegger: 4 }, ref: "沉沦警示。担心在这种设定好的框架里，所谓的自由意志只不过是预设的随机数。" },
+                { t: "只要逻辑自洽，模拟也是真实的。", s: { descartes: 5, spinoza: 3 }, ref: "理性支点。真不在于物质。如果我的逻辑链条没有断裂，能推导出规律，那么宇宙对我就是真实的。" },
+                { t: "痛苦。这意味着我无法再进行本真行动。", s: { habermas: 5, heidegger: 4 }, ref: "沉沦警示。担心在这种设定好的框架里，所谓的自由意志只不过是预设的随机数，所有开端性都是虚假的。" },
                 { t: "正好。利用这份虚幻实践绝对自由。", s: { nietzsche: 5, camus: 4 }, ref: "游戏人生。既然没有了神和绝对的实在，那么我就是这个模拟宇宙的终极艺术家。" }
             ] },
-            { q: "关于‘神’或‘宇宙终极力量’：", options: [
-                { t: "它就是自然规律本身，无处不在。", s: { spinoza: 5, hegel: 3 }, ref: "泛神论。不相信一个坐在云端审判的老头，但相信这个宇宙有一套完美、严密的数学美感。" },
-                { t: "它是一个无法被证实的‘物自体’。", s: { kant: 5 }, ref: "理性的谦卑。承认人类理智的边界。对于边界之外的东西，无法断言它存在。" },
-                { t: "它是人类在痛苦中创造出来的虚假慰藉。", s: { schopenhauer: 5, marx: 4, nietzsche: 4 }, ref: "解毒剂。认为神是人力量弱小时对自己力量的投射。我们应该收回这些投射。" }
+            { q: "关于神或宇宙终极力量：", options: [
+                { t: "它就是自然规律本身，无处不在。", s: { spinoza: 5, hegel: 3 }, ref: "泛神论。不相信坐在云端的审判者，但相信这个宇宙有一套完美、严密、不容商榷的数学美感。" },
+                { t: "它是一个无法被证实的物自体。", s: { kant: 5 }, ref: "理性的谦卑。承认人类理智的边界。对于边界之外的东西，我们可以假设其存在作为道德支撑。" },
+                { t: "它是人类在痛苦中创造出来的虚假慰藉。", s: { schopenhauer: 5, marx: 4, nietzsche: 4 }, ref: "解毒剂。认为神是人力量弱小时对自己力量的投射。我们应该收回这些投射，直面大地。" }
             ] },
             { q: "被别人标签化时，你的感受：", options: [
-                { t: "这是解构这一权力叙事的机会。", s: { foucault: 5, socrates: 3 }, ref: "话语对抗。每一个标签都是权力的入侵。弄清楚谁在贴标签、为了什么利益在贴标签，然后撕掉它。" },
-                { t: "标签超出了我的控制，与我无关。", s: { aurelius: 5, aristotle: 2 }, ref: "掌控内外。标签属于他人的意见。如果你被它激怒，你就成了他人的奴隶。" },
-                { t: "我会通过行动证明存在先于本质。", s: { beauvoir: 5, camus: 3 }, ref: "自我超越。你不是‘什么’，你正在‘成为什么’。标签是对死物的定义，而你是一股流动的活火。" }
+                { t: "这是解构这一权力叙事的机会。", s: { foucault: 5, socrates: 3 }, ref: "话语对抗。每一个标签都是权力的入侵。弄清楚谁在贴标签、为了什么利益，然后亲手撕掉它。" },
+                { t: "标签超出了我的控制，与我无关。", s: { aurelius: 5, aristotle: 2 }, ref: "掌控内外。标签属于他人的意见。如果你被它激怒，你就成了他人的奴隶。内心的要塞依然属于你。" },
+                { t: "我会通过行动证明存在先于本质。", s: { sartre: 5, camus: 3 }, ref: "自我超越。你不是什么，你正在成为什么。标签是对死物的定义，而你是一股流动的活火。" }
             ] },
             { q: "文明的意义在于：", options: [
-                { t: "摆脱自然的盲目意志，获得自由。", s: { spinoza: 5, hegel: 4 }, ref: "理性长征。文明是一部从本能的奴役走向理智自由的进化史。它是人类精神在物质荒原上的逐步显现。" },
-                { t: "建立一个让每个人展示卓越的公共空间。", s: { arendt: 5, aristotle: 3 }, ref: "卓越剧场。文明是为了创造一个平台，让人能脱离动物性的生存，进入不朽的言说。" },
+                { t: "摆脱自然的盲目意志，获得自由。", s: { spinoza: 5, hegel: 4 }, ref: "理性长征。文明是一部从本能奴役走向理智自由的进化史。它是人类精神在物质荒原上的逐步显现。" },
+                { t: "建立一个让每个人展示卓越的公共空间。", s: { habermas: 5, aristotle: 3 }, ref: "卓越剧场。文明是为了创造一个平台，让人能脱离动物性生存，进入不朽的言说与行动。" },
                 { t: "不断重估陈腐价值，寻找超人境界。", s: { nietzsche: 5, marx: 4 }, ref: "重估长夜。文明是在废墟上不断重建的过程。它通过摧毁僵死教条，来焕发新的生命强度。" }
             ] },
             { q: "深夜思考宇宙，你感到：", options: [
-                { t: "作为思考者的理性尊严与逻辑明晰。", s: { descartes: 5, spinoza: 4 }, ref: "明晰之光。即便世界毁灭，我依然是一个正在怀疑、正在计算的孤独点。觉知就是尊严。" },
-                { t: "在无限虚空中寻找那个唯一绝对的‘善’。", s: { plato: 5, murdoch: 3 }, ref: "灵魂转向。那种颤栗是对完美的向往。这种深切的‘看见’正在拉升你的存在等级。" },
-                { t: "被抛入世界的‘荒谬’感与焦虑。", s: { heidegger: 5, camus: 5 }, ref: "生存焦虑。意识到你没有任何理由地出现在这里，且必须孤身一人承担所有的选择结果。" }
+                { t: "作为思考者的理性尊严与逻辑明晰。", s: { descartes: 5, spinoza: 4 }, ref: "明晰之光。即便世界毁灭，我依然是一个正在怀疑、正在计算的孤独点。觉知就是永恒的尊严。" },
+                { t: "在无限虚空中寻找那个唯一绝对的善。", s: { plato: 5, levinas: 3 }, ref: "灵魂转向。那种颤栗是对完美的向往。你深感自己的不完美，但这种深切的看见正在拉升存在等级。" },
+                { t: "被抛入世界的荒谬感与焦虑。", s: { heidegger: 5, camus: 5 }, ref: "生存焦虑。意识到你没有任何理由地出现在这里，且必须孤身一人承担所有的选择结果。" }
             ] },
             { q: "最后，那句话最触动你？", options: [
                 { t: "“位我上者灿烂星空，道德律令在我心中。”", s: { kant: 5 }, ref: "向往崇高。在无垠的外部扩张中，守住那条绝对的内部道德支点。这是理性的最高礼赞。" },
-                { t: "“凡是不可说的，保持沉默。”", s: { wittgenstein: 5 }, ref: "逻辑敬畏。划清思想的界限。对于玄虚、神秘的领域，以沉默表达认知诚实。" },
-                { t: "“成为你自己。”", s: { nietzsche: 5, arendt: 3, beauvoir: 3 }, ref: "生命绽放。拒绝外部裁剪。生命是一场由你亲自剪辑、主演的、正在生成的长片。" }
+                { t: "“凡是不可说的，保持沉默。”", s: { wittgenstein: 5 }, ref: "逻辑敬畏。划清思想的界限。对于那些玄虚、神秘的领域，以沉默表达最高级的认知诚实。" },
+                { t: "“成为你自己。”", s: { nietzsche: 5, habermas: 3, sartre: 3 }, ref: "生命绽放。拒绝任何外部的裁剪。生命是一场由你亲自剪辑、主演的、正在生成的长片。" }
             ] }
         ];
 
         const icons = {
             foucault: { name: "福柯", school: "POST-MODERNISM", quote: "“知识即权力。人不过是沙滩上的一张脸。”", cog: "知识型", eth: "自我技术", ont: "权力网络", analysis: "你是一个敏锐的解构者。洞察到真理叙事背后的权力运作，拒绝被宏大叙事绑架。活出一种作为‘作品’的人生。", books: [{t: "《规训与惩罚》", r: "揭示权力如何塑造灵魂。"}], radar: [6, 9, 8, 7, 5], hub: { main: "解构权力逻辑", crit: "相对主义。" } },
-            arendt: { name: "阿伦特", school: "POLITICAL PHILOSOPHY", quote: "“思索是不幸发生时的避难所。”", cog: "公共领域", eth: "卓越行动", ont: "开端性", analysis: "你是一个卓越的行动者。坚信人的第二次出生在于公共领域的登场。在多元主体之间建立连接。", books: [{t: "《人的境况》", r: "探讨‘行动’赋予的尊严。"}], radar: [5, 10, 7, 6, 8], hub: { main: "行动开启自由", crit: "忽视私域。" } },
-            nietzsche: { name: "尼采", school: "EXISTENTIALISM", quote: "“每一个不曾起舞的日子，都是对生命的辜负。”", cog: "意志权力", eth: "价值重估", ont: "永恒轮回", analysis: "你是一个激进的拓荒者。洞察到平庸背后的虚无，拒绝沉沦。在荒谬的真相中舞动，亲手凿刻坐标。", books: [{t: "《查拉图斯特拉如是说》", r: "重估价值的震撼。"}], radar: [9, 8, 4, 3, 10], hub: { main: "意志高于理智", crit: "强权倾向。" } },
+            habermas: { name: "哈贝马斯", school: "CRITICAL THEORY", quote: "“真理是自由对话达成的共识。”", cog: "交往理性", eth: "程序正义", ont: "生活世界", analysis: "你是一个理性的博弈者。坚信文明的基石在于平等的对话。你试图在碎裂的现代性中，重建一套基于理智的公共契约。", books: [{t: "《交往行为理论》", r: "现代文明的理性指南。"}], radar: [9, 5, 8, 6, 4], hub: { main: "对话达成正义", crit: "理想化过于沉重。" } },
+            nietzsche: { name: "尼采", school: "EXISTENTIALISM", quote: "“每一个不曾起舞的日子，都是对生命的辜负。”", cog: "意志权力", eth: "价值重估", ont: "永恒轮回", analysis: "你是一个激进的拓荒者。洞察到平庸背后的虚无，拒绝沉沦。在荒谬中舞动，亲手凿刻坐标。", books: [{t: "《查拉图斯特拉如是说》", r: "重估价值的震撼。"}], radar: [9, 8, 4, 3, 10], hub: { main: "意志高于理智", crit: "强权倾向。" } },
             kant: { name: "康德", school: "DEONTOLOGY", quote: "“位我上者星空，道德律令在我心中。”", cog: "先验范畴", eth: "定言令回", ont: "物自体", analysis: "你是一个灵魂的立法者。向内求索那条绝对的道德律令。在物自体面前保持理性谦卑，确立主体尊严。", books: [{t: "《纯粹理性批判》", r: "彻底重塑认知。"}], radar: [10, 4, 10, 5, 6], hub: { main: "义务即自由", crit: "难以处理两难。" } },
             wittgenstein: { name: "维特根斯坦", school: "ANALYTIC", quote: "“凡是不可说的保持沉默。”", cog: "语言游戏", eth: "寂静主义", ont: "事实逻辑", analysis: "你是一个逻辑清洗者。深知语言的局限。哲学是对语言误用的清除。还世界以本来静默的面貌。", books: [{t: "《逻辑哲学论》", r: "思维的终点站。"}], radar: [8, 3, 10, 7, 5], hub: { main: "语言边界", crit: "消解探讨可能。" } },
             schopenhauer: { name: "叔本华", school: "PESSIMISM", quote: "“人生就像钟表，在痛苦与无聊之间摇摆。”", cog: "盲目意志", eth: "解脱之道", ont: "表象世界", analysis: "你是一个悲剧主义者。洞穿了生命意志盲目的本质。不再追求虚假进步，在艺术中寻找静谧。", books: [{t: "《作为意志和表象的世界》", r: "揭示欲望痛苦。"}], radar: [7, 6, 8, 4, 9], hub: { main: "意志痛苦源", crit: "过于消极。" } },
             heidegger: { name: "海德格尔", school: "ONTOLOGY", quote: "“向死而生。”", cog: "本真性", eth: "牵念", ont: "此在", analysis: "你是一个寻路人。拒绝常人的沉沦社交。在死亡预演中，开启本真生存，找回人与存在之间诗意的连接。", books: [{t: "《存在与时间》", r: "重塑时间感知。"}], radar: [5, 10, 7, 4, 8], hub: { main: "本真存在", crit: "术语晦涩。" } },
             spinoza: { name: "斯宾诺莎", school: "MONISM", quote: "“自由是对必然的认识。”", cog: "神即自然", eth: "理性直观", ont: "唯一实体", analysis: "你是一个静谧的几何学家。视万物为同一个无限实体的展开。通过认清必然规律获得自由。", books: [{t: "《伦理学》", r: "理性主义杰作。"}], radar: [10, 5, 9, 3, 4], hub: { main: "必然之自由", crit: "消解了个体。"} },
-            beauvoir: { name: "波伏娃", school: "EXISTENTIALISM", quote: "“成为了人。”", cog: "生成论", eth: "自由辩证", ont: "处境超越", analysis: "你是一个自由的开拓者。坚信存在先于本质。在具体的处境中重塑自我，活出属于自己的可能。", books: [{t: "《第二性》", r: "定义自我。"}], radar: [6, 10, 6, 8, 9], hub: { main: "存在生成", crit: "定义焦虑。" } },
+            sartre: { name: "萨特", school: "EXISTENTIALISM", quote: "“人是自由的，人即自由。”", cog: "自由选择", eth: "绝对责任", ont: "虚无生成", analysis: "你是一个自由的孤胆者。拒绝一切先天定义，坚信‘存在先于本质’。你在每一次选择中定义自己，并承担整个世界的重量。", books: [{t: "《存在与虚无》", r: "自由者的博弈指南。"}], radar: [6, 10, 5, 8, 10], hub: { main: "自由即责任", crit: "焦虑负荷极大。" } },
             descartes: { name: "笛卡尔", school: "RATIONALISM", quote: "“我思故我在。”", cog: "普遍怀疑", eth: "明晰直观", ont: "二元论", analysis: "你是一个孤独的原点测绘者。以怀疑为刃，切断未经审视的教条。在理性中重构世界。", books: [{t: "《谈谈方法》", r: "教你如何思考。"}], radar: [10, 4, 10, 3, 5], hub: { main: "理性支点", crit: "身心分裂。" } },
             hume: { name: "休谟", school: "EMPIRICISM", quote: "“理性是感性的奴隶。”", cog: "经验习惯", eth: "同情共感", ont: "温和怀疑", analysis: "你是一个优雅的解构者。以常识消解傲慢。只承认感官触碰到的真实。找到了可靠锚点。", books: [{t: "《人类理智研究》", r: "从迷梦中唤醒。"}], radar: [6, 4, 5, 10, 3], hub: { main: "归纳习惯", crit: "削弱定律逻辑。" } },
             aurelius: { name: "奥勒留", school: "STOICISM", quote: "“不像你的敌人。”", cog: "理性统治", eth: "内敛坚韧", ont: "精神堡垒", analysis: "你是一个内敛的守望者。具备分辨‘可控’与‘不可控’的智慧：守护内心不陷的宁静。", books: [{t: "《沉思录》", r: "修筑灵魂防线。"}], radar: [8, 7, 9, 6, 4], hub: { main: "顺应自然", crit: "麻木嫌疑。" } },
             plato: { name: "柏拉图", school: "IDEALISM", quote: "“影子之影子。”", cog: "洞穴喻", eth: "灵魂转向", ont: "永恒理式", analysis: "你是一个永恒的追光者。相信美与善是宇宙绝对的比例。在穿透影子中凝视理式。", books: [{t: "《理想国》", r: "所有哲学脚注。"}], radar: [9, 5, 8, 4, 6], hub: { main: "理式完美", crit: "忽视具体生命。" } },
-            murdoch: { name: "默多克", school: "REALISM", quote: "“艺术是剥离自我的练习。”", cog: "无私关注", eth: "向善之途", ont: "道德实在", analysis: "你是一个深情的注视者。认为道德核心在于对他者清晰、无私的关注。美引导灵魂回归善。", books: [{t: "《主权与向善》", r: "治愈自我贪婪。"}], radar: [6, 7, 5, 9, 4], hub: { main: "关注优于意志", crit: "缺乏程序论证。" } },
+            levinas: { name: "列维纳斯", school: "ETHICS", quote: "“伦理是第一哲学。”", cog: "他者视域", eth: "面容责任", ont: "无限差异", analysis: "你是一个深情的注视者。认为认知的终点不是占有，而是对他者的降服。你在他人的面容中，触碰到超越自我的神探责任。", books: [{t: "《整体与无限》", r: "重塑人际伦理。"}], radar: [6, 7, 5, 10, 4], hub: { main: "他者高于自我", crit: "责任过于沉重。" } },
             rawls: { name: "罗尔斯", school: "LIBERALISM", quote: "“公平即正义。”", cog: "无知之幕", eth: "差异原则", ont: "社会契约", analysis: "你是一个理性的守护者。试图在不确定性中划定公平底线。构建一整套共生法则。", books: [{t: "《正义论》", r: "现代政治圣经。"}], radar: [8, 5, 9, 6, 5], hub: { main: "无知契约", crit: "忽视社群性。" } },
-            socrates: { name: "苏格拉底", school: "CLASSICAL", quote: "“未经审视的生活不值得过。”", cog: "辩证启发", eth: "自知无知", ont: "理智德性", analysis: "你是一个永不满足的提问者。你通过不断揭开偏见的假象来接近真理。你认为思考本身就是最大的德性。", books: [{t: "《申辩篇》", r: "感受真理的力量。"}], radar: [10, 5, 8, 6, 6], hub: { main: "提问揭示真理", crit: "可能流于诡辩。" } },
-            aristotle: { name: "亚里士多德", school: "VIRTUE ETHICS", quote: "“卓越是一门艺术。”", cog: "归纳逻辑", eth: "黄金中道", ont: "质料形式", analysis: "你是一个务实的秩序构建者。你拒绝极端的狂热，在两个极端之间寻找恰到好处的‘中道’。你是理性的建筑师。", books: [{t: "《尼各马可伦理学》", r: "寻找幸福的路径。"}], radar: [8, 6, 10, 8, 4], hub: { main: "中道美德", crit: "中道界限模糊。" } },
-            hegel: { name: "黑格尔", school: "IDEALISM", quote: "“凡是现实的都是合乎理性的。”", cog: "辩证精神", eth: "伦理生活", ont: "绝对理念", analysis: "你是一个宏大的统合者。你视一切矛盾为更高阶段进化的阶梯。你相信历史正通过冲突走向绝对的自由。", books: [{t: "《精神现象学》", r: "思想的进化长征。"}], radar: [10, 4, 7, 5, 9], hub: { main: "辩证统一", crit: "可能消解个人。" } },
-            marx: { name: "马克思", school: "MATERIALISM", quote: "“问题在于改变世界。”", cog: "唯物辩证", eth: "解放实践", ont: "生产关系", analysis: "你是一个激进的变革者。你拒绝停留在解释世界的层面上。你认为真理必须在实践的泥土中，在对物质基础的重构中产生。", books: [{t: "《资本论》", r: "透视世界的底层逻辑。"}], radar: [7, 8, 5, 6, 10], hub: { main: "实践改变世界", crit: "决定论倾向。" } },
-            camus: { name: "加缪", school: "ABSURDISM", quote: "“在严冬，我发现内心有个不可战胜的夏天。”", cog: "清醒反抗", eth: "正直感", ont: "荒谬感", analysis: "你是一个骄傲的反抗者。你直面世界的荒谬而不逃避，在西西弗斯的巨石前，你用‘反抗’赋予了生命最壮丽的意义。", books: [{t: "《西西弗神话》", r: "对抗虚无的圣经。"}], radar: [5, 10, 6, 4, 10], hub: { main: "直面荒谬", crit: "理论深度受限。" } },
-            mill: { name: "穆勒", school: "UTILITARIANISM", quote: "“做一个痛苦的人，胜过做一只快乐的猪。”", cog: "逻辑实证", eth: "最大幸福", ont: "功利主义", analysis: "你是一个理性的博弈者。你追求效用的最大化，但你深知高级快乐的价值。你在计算与正义之间寻找文明的平衡点。", books: [{t: "《功利主义》", r: "伦理计算的经典。"}], radar: [7, 4, 9, 10, 5], hub: { main: "幸福最大化", crit: "可能牺牲少数人权益。" } }
+            socrates: { name: "苏格拉底", school: "CLASSICAL", quote: "“未经审视的生活不值得过。”", cog: "辩证启发", eth: "自知无知", ont: "理智德性", analysis: "你是一个提问者。通过不断揭开偏见的假象来接近真理。你认为思考本身就是最大的德性。", books: [{t: "《申辩篇》", r: "真理的力量。"}], radar: [10, 5, 8, 6, 6], hub: { main: "提问揭示真理", crit: "可能流于诡辩。" } },
+            aristotle: { name: "亚里士多德", school: "VIRTUE ETHICS", quote: "“卓越是一门艺术。”", cog: "归纳逻辑", eth: "黄金中道", ont: "质料形式", analysis: "你是一个务实的秩序构建者。在两个极端之间寻找恰到好处的‘中道’。你是理性的建筑师。", books: [{t: "《尼各马可伦理学》", r: "寻找幸福。"}], radar: [8, 6, 10, 8, 4], hub: { main: "中道美德", crit: "中道界限模糊。" } },
+            hegel: { name: "黑格尔", school: "IDEALISM", quote: "“凡是现实的都是合乎理性的。”", cog: "辩证精神", eth: "伦理生活", ont: "绝对理念", analysis: "你是一个宏大的统合者。视矛盾为进化阶梯。你相信历史正通过冲突走向绝对自由。", books: [{t: "《精神现象学》", r: "思想的进化长征。"}], radar: [10, 4, 7, 5, 9], hub: { main: "辩证统一", crit: "可能消解个人。" } },
+            marx: { name: "马克思", school: "MATERIALISM", quote: "“问题在于改变世界。”", cog: "唯物辩证", eth: "解放实践", ont: "生产关系", analysis: "你是一个变革者。拒绝停留在解释层面上。认为真理必须在实践的泥土中产生。", books: [{t: "《资本论》", r: "透视世界逻辑。"}], radar: [7, 8, 5, 6, 10], hub: { main: "实践改变世界", crit: "决定论倾向。" } },
+            camus: { name: "加缪", school: "ABSURDISM", quote: "“在严冬，发现内心的夏天。”", cog: "清醒反抗", eth: "正直感", ont: "荒谬感", analysis: "你是一个骄傲的反抗者。直面世界的荒谬而不逃避。你用‘反抗’赋予了生命壮丽的意义。", books: [{t: "《西西弗神话》", r: "对抗虚无的圣经。"}], radar: [5, 10, 6, 4, 10], hub: { main: "直面荒谬", crit: "理论深度受限。" } },
+            mill: { name: "穆勒", school: "UTILITARIANISM", quote: "“做一个痛苦的人，胜过快乐的猪。”", cog: "逻辑实证", eth: "最大幸福", ont: "功利主义", analysis: "你是一个理性的博弈者。追求效用最大化，但深知高级快乐的价值。你在计算与正义间寻找平衡点。", books: [{t: "《功利主义》", r: "伦理计算经典。"}], radar: [7, 4, 9, 10, 5], hub: { main: "幸福最大化", crit: "可能牺牲少数人。" } }
         };
 
         let current = 0, score = {}, scoreHistory = [], radarChart = null, tempSelectionScore = null;
+
+        // 验证码校验函数
+        function verifyAndStart() {
+            const input = document.getElementById('access-code').value.trim();
+            const errorHint = document.getElementById('code-error-hint');
+            
+            if (input === "tyuiop") {
+                errorHint.style.display = "none";
+                start();
+            } else {
+                errorHint.style.display = "block";
+                document.getElementById('access-code').style.borderBottom = "2px solid #f7514f";
+            }
+        }
 
         function start() { show('quiz'); loadQ(); }
         
@@ -422,7 +462,6 @@
             data.options.forEach((o, idx) => {
                 const div = document.createElement('div');
                 div.className = 'opt';
-                // 已移除 ref-tag 标题行，背景设为浅绿
                 div.innerHTML = `${o.t}<div class="opt-ref-box">${o.ref}</div>`;
                 div.onclick = () => select(o.s, div);
                 cont.appendChild(div);
@@ -491,27 +530,22 @@
                 primary.books.forEach(b => { bCont.innerHTML += `<div class="book-box"><h4>${b.t}</h4><p>${b.r}</p></div>`; });
                 
                 show('result');
-                // 彻底修复显示不出来的核心逻辑：
-                // 1. 先进行页面切换，确保容器已处于 display:flex 状态
-                // 2. 延迟执行 Chart.js 渲染，避开动画冲突
                 setTimeout(() => {
                     renderRadar(primary.radar);
                     renderSpectrums();
                 }, 600);
             } catch (e) {
-                console.error("Result process failed", e);
+                console.error("Process failed", e);
                 show('result');
             }
         }
 
         function renderRadar(data) {
-            // 确保 Chart.js 已加载
             if (typeof Chart === 'undefined') return;
             const canvas = document.getElementById('radarChart');
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             if(radarChart) radarChart.destroy();
-            
             radarChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
@@ -529,15 +563,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     animation: { duration: 1500, easing: 'easeOutQuart' },
-                    scales: { 
-                        r: { 
-                            grid: { color: 'rgba(0,0,0,0.05)' }, 
-                            angleLines: { color: 'rgba(0,0,0,0.05)' }, 
-                            ticks: { display: false }, 
-                            suggestedMin: 0, suggestedMax: 10,
-                            pointLabels: { font: { size: 11, weight: '600' } }
-                        } 
-                    },
+                    scales: { r: { grid: { color: 'rgba(0,0,0,0.05)' }, angleLines: { color: 'rgba(0,0,0,0.05)' }, ticks: { display: false }, suggestedMin: 0, suggestedMax: 10, pointLabels: { font: { size: 11, weight: '600' } } } },
                     plugins: { legend: { display: false } }
                 }
             });
@@ -551,7 +577,8 @@
                 const val = Math.random() * 60 + 20; 
                 const item = document.createElement('div');
                 item.className = 'spectrum-bar';
-                item.innerHTML = `<div class="spec-labels"><span>${conf.l}</span><span>${conf.r}</span></div><div class="spec-track"><div class="spec-dot" style="left: ${val}%"></div></div>`;
+                item.innerHTML = `<div class="spec-labels" style="display:flex; justify-content:space-between; font-size:0.5rem; color:var(--text-main); margin-bottom:0.6rem; font-weight:800; text-transform:uppercase;"><span>${conf.l}</span><span>${conf.r}</span></div><div class="spec-track" style="height:3px; background:var(--secondary); position:relative; border-radius:10px;"><div class="spec-dot" style="position:absolute; top:-5px; width:13px; height:13px; background:var(--danger); border-radius:50%; transition:left 1.5s ease; border:2.5px solid #fff; box-shadow:0 4px 10px rgba(0,0,0,0.1); left:${val}%"></div></div>`;
+                item.style.marginBottom = "1.8rem";
                 cont.appendChild(item);
             });
         }
@@ -578,7 +605,7 @@
             loader.style.display = 'flex';
             html2canvas(document.getElementById('result-poster'), { backgroundColor: '#ffffff', scale: 2, useCORS: true }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `PHILO_ARCHIVE_FINAL.png`;
+                link.download = `PHILO_ARCHIVE_MALE.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 loader.style.display = 'none';
